@@ -38,6 +38,7 @@ testem.log
 /typings
 /ssl
 /.vscode
+/.angular
 
 # System files
 .DS_Store
