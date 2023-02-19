@@ -10,6 +10,8 @@ namespace API.Data
         }
 
         public DbSet<AppUser>? Users { get; set; }	
+		public DbSet<UserInterest>? UserInterests { get; set; }
+		public DbSet<AppUserUserInterest>? AppUserUserInterests { get; set; }
 		
 		protected override void OnModelCreating(ModelBuilder builder)
 		{

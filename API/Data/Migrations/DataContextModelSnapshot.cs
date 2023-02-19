@@ -99,7 +99,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("UserInterestId");
 
-                    b.ToTable("AppUserUserInterest");
+                    b.ToTable("AppUserUserInterests");
                 });
 
             modelBuilder.Entity("API.Entities.UserInterest", b =>
@@ -114,7 +114,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserInterest");
+                    b.ToTable("UserInterests");
                 });
 
             modelBuilder.Entity("API.Entities.UserPhoto", b =>
