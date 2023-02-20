@@ -87,21 +87,6 @@ namespace API.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("API.Entities.AppUserUserInterest", b =>
-                {
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserInterestId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("AppUserId", "UserInterestId");
-
-                    b.HasIndex("UserInterestId");
-
-                    b.ToTable("AppUserUserInterests");
-                });
-
             modelBuilder.Entity("API.Entities.UserInterest", b =>
                 {
                     b.Property<int>("Id")
@@ -139,26 +124,22 @@ namespace API.Data.Migrations
                     b.HasIndex("AppUserId")
                         .IsUnique();
 
-                    b.ToTable("UserPhotos");
+                    b.ToTable("UserPhoto");
                 });
 
-            modelBuilder.Entity("API.Entities.AppUserUserInterest", b =>
+            modelBuilder.Entity("AppUserUserInterest", b =>
                 {
-                    b.HasOne("API.Entities.AppUser", "AppUser")
-                        .WithMany("AppUserUserInterests")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<int>("AppUsersId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasOne("API.Entities.UserInterest", "UserInterest")
-                        .WithMany("AppUserUserInterests")
-                        .HasForeignKey("UserInterestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<int>("UserInterestsId")
+                        .HasColumnType("INTEGER");
 
-                    b.Navigation("AppUser");
+                    b.HasKey("AppUsersId", "UserInterestsId");
 
-                    b.Navigation("UserInterest");
+                    b.HasIndex("UserInterestsId");
+
+                    b.ToTable("AppUserUserInterest");
                 });
 
             modelBuilder.Entity("API.Entities.UserPhoto", b =>
@@ -172,16 +153,24 @@ namespace API.Data.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("API.Entities.AppUser", b =>
+            modelBuilder.Entity("AppUserUserInterest", b =>
                 {
-                    b.Navigation("AppUserUserInterests");
+                    b.HasOne("API.Entities.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("AppUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("UserPhoto");
+                    b.HasOne("API.Entities.UserInterest", null)
+                        .WithMany()
+                        .HasForeignKey("UserInterestsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("API.Entities.UserInterest", b =>
+            modelBuilder.Entity("API.Entities.AppUser", b =>
                 {
-                    b.Navigation("AppUserUserInterests");
+                    b.Navigation("UserPhoto");
                 });
 #pragma warning restore 612, 618
         }

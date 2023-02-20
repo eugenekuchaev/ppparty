@@ -6,6 +6,6 @@ namespace API.Entities
         public string InterestName { get; set; } = string.Empty;
 
         // Navigation properties
-        public ICollection<AppUserUserInterest>? AppUserUserInterests { get; set; }
+        public ICollection<AppUser>? AppUsers { get; set; }
     }
 }

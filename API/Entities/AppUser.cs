@@ -35,6 +35,6 @@ namespace API.Entities
 
 		// Navigation properties
 		public UserPhoto? UserPhoto { get; set; }
-		public ICollection<AppUserUserInterest>? AppUserUserInterests { get; set; }
+		public ICollection<UserInterest>? UserInterests { get; set; }
 	}
 }
