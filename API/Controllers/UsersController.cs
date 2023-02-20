@@ -8,6 +8,7 @@ namespace API.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]")]
+	[Authorize]
 	public class UsersController : ControllerBase
 	{
 		private readonly DataContext _context;
@@ -18,17 +19,15 @@ namespace API.Controllers
 		}
 		
 		[HttpGet]
-		[AllowAnonymous]
 		public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
 		{
-			return await _context.Users!.ToListAsync();
+			return await _context.Users.ToListAsync();
 		}
-		
-		[Authorize]
+	
 		[HttpGet("{id}")]
 		public async Task<ActionResult<AppUser?>> GetUser(int id)
 		{
-			return await _context.Users!.FindAsync(id);
+			return await _context.Users.FindAsync(id);
 		}
 	}
 }

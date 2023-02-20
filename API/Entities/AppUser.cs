@@ -5,11 +5,11 @@ namespace API.Entities
 		public int Id { get; set; }
 
 		// Registration properties
-		public string FullName { get; set; } = string.Empty;
-		public string UserName { get; set; } = string.Empty; 
-		public string Email { get; set; } = string.Empty; 
-		public byte[] PasswordHash { get; set; } = default!;
-		public byte[] PasswordSalt { get; set; } = default!; 
+		public string FullName { get; set; } = null!;
+		public string UserName { get; set; } = null!;
+		public string Email { get; set; } = null!;
+		public byte[] PasswordHash { get; set; } = null!;
+		public byte[] PasswordSalt { get; set; } = null!;
 
 		// Location properties
 		public string? Country { get; set; }	
