@@ -1,15 +1,15 @@
-namespace API.Entities
+using API.Entities;
+
+namespace API.DTOs
 {
-	public class AppUser
+	public class MemberDto
 	{
 		public int Id { get; set; }
 
 		// Registration properties
 		public string FullName { get; set; } = null!;
-		public string UserName { get; set; } = null!;
+		public string Username { get; set; } = null!;
 		public string Email { get; set; } = null!;
-		public byte[] PasswordHash { get; set; } = null!;
-		public byte[] PasswordSalt { get; set; } = null!;
 
 		// Location properties
 		public string? Country { get; set; }	
@@ -18,6 +18,7 @@ namespace API.Entities
 
 		// Personal information properties
 		public string? About { get; set; }
+		public string? UserPhotoUrl { get; set; }
 
 		// Contacts properties
 		public string? PhoneNumber { get; set; }
@@ -28,13 +29,13 @@ namespace API.Entities
 		public string? WebsiteLink { get; set; }
 
 		// System properties
-		public double Rating { get; set; } = 0.0;
+		public double Rating { get; set; }
 		// Doesn't have any functionality at the time, but can be useful in the future
-		public DateTime Created { get; set; } = DateTime.Now;
-		public DateTime LastActive { get; set; } = DateTime.Now;
+		public DateTime Created { get; set; } 
+		public DateTime LastActive { get; set; } 
 
 		// Navigation properties
-		public UserPhoto UserPhoto { get; set; } = null!;
+		public UserPhotoDto? UserPhoto { get; set; }
 		public ICollection<UserInterest>? UserInterests { get; set; }
 	}
 }

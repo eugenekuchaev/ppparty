@@ -169,7 +169,8 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.AppUser", b =>
                 {
-                    b.Navigation("UserPhoto");
+                    b.Navigation("UserPhoto")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
