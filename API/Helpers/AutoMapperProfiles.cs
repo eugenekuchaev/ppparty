@@ -4,7 +4,7 @@ using AutoMapper;
 
 namespace API.Helpers
 {
-    public class AutoMapperProfiles : Profile
+	public class AutoMapperProfiles : Profile
 	{
 		public AutoMapperProfiles()
 		{
@@ -12,6 +12,7 @@ namespace API.Helpers
 				.ForMember(dest => dest.UserPhotoUrl, 
 					opt => opt.MapFrom(src => src.UserPhoto.PhotoUrl));
 			CreateMap<UserPhoto, UserPhotoDto>();
+			CreateMap<UserInterest, UserInterestDto>();
 		}
 	}
 }
