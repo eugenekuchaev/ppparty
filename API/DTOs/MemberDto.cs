@@ -36,6 +36,6 @@ namespace API.DTOs
 
 		// Navigation properties
 		public UserPhotoDto? UserPhoto { get; set; }
-		public ICollection<UserInterestDto>? UserInterests { get; set; }
+		public ICollection<UserInterestDto>? UserInterests { get; set; } 
 	}
 }

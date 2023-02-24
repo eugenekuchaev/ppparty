@@ -1,0 +1,49 @@
+body{
+    background: #eee;
+}
+
+.card{
+    border: none;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.fonts{
+    font-size: 16px;
+}
+
+.badge {
+    margin-right: 5px;
+}
+
+.fa {
+    font-size: 25px;
+    width: 50px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.fa:hover {
+    opacity: 0.7;
+}
+
+.fa-instagram {
+    color: #3b5998;
+}
+
+.fa-instagram {
+    color: #ac2bac;
+}
+
+.fa-twitter {
+    color: #55acee;
+}
+
+.fa-linkedin {
+    color: #0082ca;
+}
+
+.fa-globe {
+    color: #dd4b39;
+}
