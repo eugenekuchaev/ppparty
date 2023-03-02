@@ -1,0 +1,49 @@
+<div class="row" *ngIf="member">
+    <div class="col-4"></div>
+    <div class="text-center col-4">
+        <h4 class="mb-3">Change email</h4>
+        <form #editEmail="ngForm" (ngSubmit)="updateEmail()" class="mb-5">
+            <div class="mb-3">
+                <input 
+                    [(ngModel)]="member.email"
+                    type="email" 
+                    name="email" 
+                    class="form-control" 
+                    placeholder="Email address"
+                    autocomplete="off">
+            </div>
+            <button [disabled]="!editEmail.dirty" type="submit" class="btn btn-success">Save changes</button>
+        </form>
+        <h4 class="mb-3">Change password</h4>
+        <form #editPassword="ngForm" (ngSubmit)="updatePassword()" class="mb-5">
+            <div class="mb-3">
+                <input 
+                    type="password" 
+                    name="oldpassword" 
+                    class="form-control" 
+                    placeholder="Current password"
+                    autocomplete="off"
+                    ngModel>
+            </div>
+            <div class="mb-3">
+                <input 
+                    type="password" 
+                    name="newpassword" 
+                    class="form-control" 
+                    placeholder="New password"
+                    autocomplete="off"
+                    ngModel>
+            </div>
+            <div class="mb-3">
+                <input 
+                    type="password" 
+                    name="confirmnewpassword" 
+                    class="form-control" 
+                    placeholder="Confirm new password"
+                    autocomplete="off" 
+                    ngModel>
+            </div>
+            <button [disabled]="!editPassword.dirty" type="submit" class="btn btn-success">Save changes</button>
+        </form>
+    </div>
+</div>

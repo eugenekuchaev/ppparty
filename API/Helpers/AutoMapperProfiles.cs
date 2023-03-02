@@ -13,6 +13,10 @@ namespace API.Helpers
 					opt => opt.MapFrom(src => src.UserPhoto.PhotoUrl));
 			CreateMap<UserPhoto, UserPhotoDto>();
 			CreateMap<UserInterest, UserInterestDto>();
+			CreateMap<NameUpdateDto, AppUser>();
+			CreateMap<LocationUpdateDto, AppUser>();
+			CreateMap<AboutUpdateDto, AppUser>();
+			CreateMap<ContactsUpdateDto, AppUser>();
 		}
 	}
 }

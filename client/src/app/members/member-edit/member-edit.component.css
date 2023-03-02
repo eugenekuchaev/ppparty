@@ -1,0 +1,9 @@
+a {
+    cursor: pointer;
+}
+
+.badge {
+    margin-right: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}

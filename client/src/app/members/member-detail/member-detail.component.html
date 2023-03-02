@@ -1,10 +1,11 @@
-<div class="container mt-5 mb-5">
+<div class="container mt-5 mb-5" *ngIf="member">
     <div class="row d-flex justify-content-center">
         <div class="col-md-7">
             <div class="card p-3 py-4">
                 <div class="text-center">
                     <img src="{{member.userPhotoUrl || './assets/user.png'}}" width="150" class="rounded-circle">
-                    <h2 class="mt-1 mb-0">{{member.fullName}}</h2>
+                    <h3 class="mt-1 mb-0">{{member.fullName}}</h3>
+                    <h6 class="mb-3">@{{member.username}}</h6>
                     <div>
                         <p class="fonts">{{member.city}}, {{member.region}} <br> {{member.country}}</p>
                     </div>
@@ -20,15 +21,15 @@
                         <p class="fonts">{{member.email}} <br> {{member.phoneNumber}}</p>
                     </div>
                     <div>
-                        <a *ngIf="member.facebookLink != null" href="{{member.facebookLink}}" role="button"><i
+                        <a *ngIf="member.facebookLink != null && member.facebookLink != ''" href="{{member.facebookLink}}" role="button"><i
                                 class="fa fa-facebook"></i></a>
-                        <a *ngIf="member.instagramLink != null" href="{{member.instagramLink}}" role="button"><i
+                        <a *ngIf="member.instagramLink != null && member.instagramLink != ''" href="{{member.instagramLink}}" role="button"><i
                                 class="fa fa-instagram"></i></a>
-                        <a *ngIf="member.twitterLink != null" href="{{member.twitterLink}}" role="button"><i
+                        <a *ngIf="member.twitterLink != null && member.twitterLink != ''" href="{{member.twitterLink}}" role="button"><i
                                 class="fa fa-twitter"></i></a>
-                        <a *ngIf="member.linkedInLink != null" href="{{member.linkedInLink}}" role="button"><i
+                        <a *ngIf="member.linkedInLink != null && member.linkedInLink != ''" href="{{member.linkedInLink}}" role="button"><i
                                 class="fa fa-linkedin"></i></a>
-                        <a *ngIf="member.websiteLink != null" href="{{member.websiteLink}}" role="button"><i
+                        <a *ngIf="member.websiteLink != null && member.websiteLink != ''" href="{{member.websiteLink}}" role="button"><i
                                 class="fa fa-globe"></i></a>
                     </div>
                     <button class="btn btn-success mt-4 mb-1">Add to friends</button>

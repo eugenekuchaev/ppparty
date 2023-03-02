@@ -1,0 +1,179 @@
+<div class="row" *ngIf="member">
+    <div class="col-2">
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item mb-1">
+                <div *ngIf="generalIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnGeneral()">General</a>
+                </div>
+                <div *ngIf="generalIsActivated == false">
+                    <a class="nav-link" (click)="clickOnGeneral()">General</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="contactsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnContacts()">Contacts</a>
+                </div>
+                <div *ngIf="contactsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnContacts()">Contacts</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="changePhotoIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnChangePhoto()">Change photo</a>
+                </div>
+                <div *ngIf="changePhotoIsActivated == false">
+                    <a class="nav-link" (click)="clickOnChangePhoto()">Change photo</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-2"></div>
+
+    <div class="col-4 text-center">
+        <div *ngIf="generalIsActivated == true">
+            <h4 class="mb-3">Name</h4>
+            <form #editNameForm="ngForm" (ngSubmit)="updateName()" class="mb-5">
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.fullName" 
+                        type="text" 
+                        name="fullName" 
+                        class="form-control" 
+                        placeholder="Full name" 
+                        autocomplete="off">
+                </div>
+                <button [disabled]="!editNameForm.dirty" type="submit" class="btn btn-success">Save changes</button>
+            </form>
+            <h4 class="mb-3">Location</h4>
+            <form #editLocationForm="ngForm" (ngSubmit)="updateLocation()" class="mb-5">
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.city" 
+                        type="text" 
+                        name="city" 
+                        class="form-control" 
+                        placeholder="City"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.region"
+                        type="text" 
+                        name="region" 
+                        class="form-control" 
+                        placeholder="Region"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.country"
+                        type="text" 
+                        name="country" 
+                        class="form-control" 
+                        placeholder="Country"
+                        autocomplete="off">
+                </div>
+                <button [disabled]="!editLocationForm.dirty" type="submit" class="btn btn-success">Save changes</button>
+            </form>
+            <h4 class="mb-3">About</h4>
+            <form #editAboutForm="ngForm" (ngSubmit)="updateAbout()" class="mb-5">
+                <div class="mb-3">
+                    <textarea 
+                        [(ngModel)]="member.about" 
+                        type="text" 
+                        name="about" 
+                        class="form-control" 
+                        rows="8"
+                        placeholder="Full name" 
+                        autocomplete="off">
+                    </textarea>
+                </div>
+                <button [disabled]="!editAboutForm.dirty" type="submit" class="btn btn-success">Save changes</button>
+            </form>
+            <h4 class="mb-2">Interests</h4>
+            <ng-container *ngFor="let userInterest of userInterests">
+                <span 
+                    class="badge bg-primary" 
+                    (click)="deleteInterest(userInterest.interestName)">
+                        {{userInterest.interestName}}
+                </span>
+            </ng-container>
+            <form #editInterestsForm="ngForm" (ngSubmit)="addInterests(interests)" class="mb-5">
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="interests"
+                        type="text" 
+                        name="interests" 
+                        class="form-control"
+                        placeholder="Interests, separated by comma"
+                        autocomplete="off">
+                </div>
+                <button [disabled]="!editInterestsForm.dirty" type="submit" class="btn btn-success">Add</button>
+            </form>
+        </div>
+        <div *ngIf="contactsIsActivated == true">
+            <h4 class="mb-3">Contacts</h4>
+            <form #editContactsForm="ngForm" (ngSubmit)="updateContacts()" class="mb-5">
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.phoneNumber"
+                        type="text" 
+                        name="phoneNumber" 
+                        class="form-control" 
+                        placeholder="Phone number"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.facebookLink"
+                        type="text" 
+                        name="facebookLink" 
+                        class="form-control" 
+                        placeholder="Facebook link"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.instagramLink"
+                        type="text" 
+                        name="instagramLink" 
+                        class="form-control" 
+                        placeholder="Instagram link"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.twitterLink"
+                        type="text" 
+                        name="twitterLink" 
+                        class="form-control" 
+                        placeholder="Twitter link"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.linkedInLink"
+                        type="text" 
+                        name="linkedInLink" 
+                        class="form-control" 
+                        placeholder="LinkedIn link"
+                        autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <input 
+                        [(ngModel)]="member.websiteLink"
+                        type="text" 
+                        name="websiteLink" 
+                        class="form-control"
+                        placeholder="Personal website link"
+                        autocomplete="off">
+                </div>
+                <button [disabled]="!editContactsForm.dirty" type="submit" class="btn btn-success">Save changes</button>
+            </form>
+        </div>
+        <div *ngIf="changePhotoIsActivated == true">
+            <h4>Change photo</h4>
+        </div>
+    </div>
+</div>

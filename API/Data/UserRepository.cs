@@ -43,6 +43,7 @@ namespace API.Data
 		{
 			return await _context.Users
 				.Include(p => p.UserPhoto)
+				.Include(p => p.UserInterests)
 				.SingleOrDefaultAsync(x => x.UserName == username);
 		}
 
@@ -50,7 +51,18 @@ namespace API.Data
 		{
 			return await _context.Users
 				.Include(p => p.UserPhoto)
+				.Include(p => p.UserInterests)
 				.ToListAsync();
+		}
+		
+		public async Task<IEnumerable<UserInterest>> GetUserInterestsAsync()
+		{
+			return await _context.UserInterests.ToListAsync();
+		}
+		
+		public async Task<UserInterest?> GetUserInterestByNameAsync(string interestName)
+		{
+			return await _context.UserInterests.SingleOrDefaultAsync(x => x.InterestName == interestName);
 		}
 
 		public async Task<bool> SaveAllAsync()
@@ -58,7 +70,7 @@ namespace API.Data
 			return await _context.SaveChangesAsync() > 0;
 		}
 
-		public void Update(AppUser user)
+		public void UpdateUser(AppUser user)
 		{
 			_context.Entry(user).State = EntityState.Modified;
 		}
