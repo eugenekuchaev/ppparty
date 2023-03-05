@@ -77,7 +77,7 @@ namespace API.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserPhoto",
+                name: "UserPhotos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -88,9 +88,9 @@ namespace API.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserPhoto", x => x.Id);
+                    table.PrimaryKey("PK_UserPhotos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserPhoto_Users_AppUserId",
+                        name: "FK_UserPhotos_Users_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -103,8 +103,8 @@ namespace API.Data.Migrations
                 column: "UserInterestsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPhoto_AppUserId",
-                table: "UserPhoto",
+                name: "IX_UserPhotos_AppUserId",
+                table: "UserPhotos",
                 column: "AppUserId",
                 unique: true);
         }
@@ -115,7 +115,7 @@ namespace API.Data.Migrations
                 name: "AppUserUserInterest");
 
             migrationBuilder.DropTable(
-                name: "UserPhoto");
+                name: "UserPhotos");
 
             migrationBuilder.DropTable(
                 name: "UserInterests");

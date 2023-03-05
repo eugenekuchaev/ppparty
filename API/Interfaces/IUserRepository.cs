@@ -5,6 +5,7 @@ namespace API.Interfaces
 {
 	public interface IUserRepository
 	{
+		void AddPhoto(UserPhoto photo);
 		Task<UserInterest?> GetUserInterestByNameAsync(string interestName);
 		Task<IEnumerable<UserInterest>> GetUserInterestsAsync();
 		void UpdateUser(AppUser user);

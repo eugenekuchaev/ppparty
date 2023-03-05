@@ -11,5 +11,6 @@ namespace API.Data
 
 		public DbSet<AppUser> Users => Set<AppUser>();
 		public DbSet<UserInterest> UserInterests => Set<UserInterest>();
+		public DbSet<UserPhoto> UserPhotos => Set<UserPhoto>();
 	}
 }

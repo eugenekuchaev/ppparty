@@ -1,0 +1,21 @@
+<div class="row mt-3">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <div class="mb-3">
+            <div ng2FileDrop ng2FileSelect
+                [ngClass]="{'nv-file-over': hasBaseDropZoneOver}" 
+                (fileOver)="fileOverBase($event)"
+                [uploader]="uploader" 
+                class="card bg-faded p-3 text-center mb-3 my-drop-zone">
+                <i class="fa fa-upload fa-3x"></i>
+                Drop photo here
+            </div>
+        </div>
+    </div>
+    <div>
+        <button type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()"
+            [disabled]="!uploader.getNotUploadedItems().length">
+            <span class="glyphicon glyphicon-upload"></span> Upload photo
+        </button>
+    </div>
+</div>

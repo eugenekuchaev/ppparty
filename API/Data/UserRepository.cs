@@ -74,5 +74,10 @@ namespace API.Data
 		{
 			_context.Entry(user).State = EntityState.Modified;
 		}
+		
+		public void AddPhoto(UserPhoto photo)
+		{
+			_context.UserPhotos.Add(photo);
+		}
 	}
 }
