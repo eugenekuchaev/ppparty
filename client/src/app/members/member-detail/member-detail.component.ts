@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Member } from 'src/app/_models/member';
+import { UserInterest } from 'src/app/_models/userInterest';
 import { MembersService } from 'src/app/_services/members.service';
 
 @Component({
@@ -19,7 +20,9 @@ export class MemberDetailComponent implements OnInit {
 
   loadMember() {
     this.memberService.getMember(this.route.snapshot.paramMap.get('username')).subscribe({
-      next: member => this.member = member
+      next: member => {
+        this.member = member;
+      }
     })
   }
 

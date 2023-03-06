@@ -25,6 +25,8 @@ namespace API.Extensions
 
 			services.AddScoped<IUserRepository, UserRepository>();
 			
+			services.AddScoped<LinkTransformer>();
+			
 			return services;
 		}
 	}

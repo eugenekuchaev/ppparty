@@ -27,6 +27,7 @@ namespace API.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Country")
@@ -71,6 +72,9 @@ namespace API.Data.Migrations
 
                     b.Property<string>("Region")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("ShowEmail")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TwitterLink")
                         .HasColumnType("TEXT");

@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -17,9 +18,12 @@ namespace API.Controllers
 		private readonly IUserRepository _userRepository;
 		private readonly IMapper _mapper;
 		private readonly IPhotoService _photoService;
+		private readonly LinkTransformer _linkTransformer;
 
-		public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService)
+		public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService, 
+			LinkTransformer linkTransformer)
 		{
+			_linkTransformer = linkTransformer;
 			_photoService = photoService;
 			_mapper = mapper;
 			_userRepository = userRepository;
@@ -66,10 +70,15 @@ namespace API.Controllers
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			
+			if (locationUpdateDto.City == "" || locationUpdateDto.City == null)
+			{
+				locationUpdateDto.City = "Somewhere";
+			}
+			
 			var trimmedLocationUpdateDto = new LocationUpdateDto 
 			{
-				City = locationUpdateDto?.City?.Trim(),
-				Region = locationUpdateDto?.Region?.Trim(),
+				City = locationUpdateDto.City.Trim(),
+				Region = locationUpdateDto.Region?.Trim(),
 				Country = locationUpdateDto?.Country?.Trim()
 			};
 
@@ -179,8 +188,14 @@ namespace API.Controllers
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			_mapper.Map(contactsUpdateDto, user);
+			
+			user!.FacebookLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.FacebookLink);
+			user.InstagramLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.InstagramLink);
+			user.TwitterLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.TwitterLink);
+			user.LinkedInLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.LinkedInLink);
+			user.WebsiteLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.WebsiteLink);
 
-			_userRepository.UpdateUser(user!);
+			_userRepository.UpdateUser(user);
 
 			if (await _userRepository.SaveAllAsync())
 			{

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230304065923_InitialCreate")]
+    [Migration("20230306221100_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,6 +29,7 @@ namespace API.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Country")
@@ -73,6 +74,9 @@ namespace API.Data.Migrations
 
                     b.Property<string>("Region")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("ShowEmail")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TwitterLink")
                         .HasColumnType("TEXT");

@@ -3,34 +3,55 @@
         <div class="col-md-7">
             <div class="card p-3 py-4">
                 <div class="text-center">
-                    <img src="{{member.userPhotoUrl || './assets/user.png'}}" width="150" class="rounded-circle">
+                    <img src="{{member.userPhotoUrl}}" width="150" class="rounded-circle">
                     <h3 class="mt-1 mb-0">{{member.fullName}}</h3>
                     <h6 class="mb-3">@{{member.username}}</h6>
-                    <div>
+                    <div *ngIf="member.city !== null && member.region !== null && member.country !== null">
                         <p class="fonts">{{member.city}}, {{member.region}} <br> {{member.country}}</p>
+                    </div>
+                    <div *ngIf="member.city !== null && member.region !== null && member.country === null">
+                        <p class="fonts">{{member.city}}, {{member.region}}</p>
+                    </div>
+                    <div *ngIf="member.city === null && member.region !== null && member.country !== null">
+                        <p class="fonts">{{member.region}} <br> {{member.country}}</p>
+                    </div>
+                    <div *ngIf="member.city !== null && member.region === null && member.country !== null">
+                        <p class="fonts">{{member.city}} <br> {{member.country}}</p>
+                    </div>
+                    <div *ngIf="member.city !== null && member.region === null && member.country === null">
+                        <p class="fonts">{{member.city}}</p>
+                    </div>
+                    <div *ngIf="member.city === null && member.region === null && member.country !== null">
+                        <p class="fonts">{{member.country}}</p>
+                    </div>
+                    <div *ngIf="member.city === null && member.region !== null && member.country === null">
+                        <p class="fonts">{{member.region}}</p>
                     </div>
                     <div class="px-4 mt-1">
                         <p class="fonts">{{member.about}}</p>
                     </div>
-                    <h5 class="mt-2 mb-2">Interests</h5>
-                    <ng-container *ngFor="let userInterest of member.userInterests">
-                        <span class="badge bg-primary">{{userInterest.interestName}}</span>
-                    </ng-container>
+                    <div>
+                        <h5 class="mt-2 mb-2">Interests</h5>
+                        <ng-container *ngFor="let userInterest of member.userInterests">
+                            <span class="badge bg-primary">{{userInterest.interestName}}</span>
+                        </ng-container>
+                    </div>
+
                     <h5 class="mt-4">Contacts</h5>
                     <div>
                         <p class="fonts">{{member.email}} <br> {{member.phoneNumber}}</p>
                     </div>
                     <div>
-                        <a *ngIf="member.facebookLink != null && member.facebookLink != ''" href="{{member.facebookLink}}" role="button"><i
-                                class="fa fa-facebook"></i></a>
-                        <a *ngIf="member.instagramLink != null && member.instagramLink != ''" href="{{member.instagramLink}}" role="button"><i
-                                class="fa fa-instagram"></i></a>
-                        <a *ngIf="member.twitterLink != null && member.twitterLink != ''" href="{{member.twitterLink}}" role="button"><i
-                                class="fa fa-twitter"></i></a>
-                        <a *ngIf="member.linkedInLink != null && member.linkedInLink != ''" href="{{member.linkedInLink}}" role="button"><i
-                                class="fa fa-linkedin"></i></a>
-                        <a *ngIf="member.websiteLink != null && member.websiteLink != ''" href="{{member.websiteLink}}" role="button"><i
-                                class="fa fa-globe"></i></a>
+                        <a *ngIf="member.facebookLink != null && member.facebookLink != ''"
+                            href="{{member.facebookLink}}" role="button"><i class="fa fa-facebook"></i></a>
+                        <a *ngIf="member.instagramLink != null && member.instagramLink != ''"
+                            href="{{member.instagramLink}}" role="button"><i class="fa fa-instagram"></i></a>
+                        <a *ngIf="member.twitterLink != null && member.twitterLink != ''" href="{{member.twitterLink}}"
+                            role="button"><i class="fa fa-twitter"></i></a>
+                        <a *ngIf="member.linkedInLink != null && member.linkedInLink != ''"
+                            href="{{member.linkedInLink}}" role="button"><i class="fa fa-linkedin"></i></a>
+                        <a *ngIf="member.websiteLink != null && member.websiteLink != ''" href="{{member.websiteLink}}"
+                            role="button"><i class="fa fa-globe"></i></a>
                     </div>
                     <button class="btn btn-success mt-4 mb-1">Add to friends</button>
                 </div>

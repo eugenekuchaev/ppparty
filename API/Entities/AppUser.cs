@@ -8,13 +8,14 @@ namespace API.Entities
 		public string FullName { get; set; } = null!;
 		public string UserName { get; set; } = null!;
 		public string Email { get; set; } = null!;
+		public bool ShowEmail { get; set; }
 		public byte[] PasswordHash { get; set; } = null!;
 		public byte[] PasswordSalt { get; set; } = null!;
 
 		// Location properties
 		public string? Country { get; set; }	
 		public string? Region { get; set; }
-		public string? City { get; set; }
+		public string City { get; set; } = "Somewhere";
 
 		// Personal information properties
 		public string? About { get; set; }
