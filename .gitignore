@@ -440,6 +440,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# JetBrains Fleet
+.fleet/
+
 # JetBrains Rider
 .idea/
 *.sln.iml
