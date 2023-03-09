@@ -17,8 +17,10 @@
 
         <div class="dropdown" *ngIf="(accountService.currentUser$ | async) as user" dropdown>
             <img src="{{user.photoUrl}}" alt="{{user.fullName}}" class="rounded-circle">
-            <a class="dropdown-toggle text-light" dropdownToggle>{{user.username | titlecase}}</a>
+            <a class="dropdown-toggle text-light" dropdownToggle>{{user.fullName}}</a>
             <div class="dropdown-menu mt-3" *dropdownMenu>
+                <a class="dropdown-item" routerLink="/members/{{user.username}}">My profile</a>
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" routerLink='/member/edit'>Edit profile</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" routerLink='/member/security'>Security</a>

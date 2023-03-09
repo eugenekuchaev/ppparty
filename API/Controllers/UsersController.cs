@@ -32,6 +32,9 @@ namespace API.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userParams)
 		{
+			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			userParams.CurrentUsername = user!.UserName;
+			
 			var users = await _userRepository.GetMembersAsync(userParams);
 			
 			Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
@@ -127,7 +130,7 @@ namespace API.Controllers
 
 			if (interests == null || interests == "" || containsOnlySpacesOrCommas)
 			{
-				return BadRequest("You need to add interests.");
+				return BadRequest("You need to add interests");
 			}
 
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -141,6 +144,11 @@ namespace API.Controllers
 			{
 				if (userInterest != "") 
 				{
+					if (userInterest.Length > 32)
+					{
+						return BadRequest("One of the interests is too long");
+					}
+					
 					var userInterestFromDb = await _userRepository.GetUserInterestByNameAsync(userInterest);
 					
 					if (userInterestFromDb != null)
@@ -159,7 +167,7 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to add interests.");
+			return BadRequest("Failed to add interests");
 		}
 
 		[HttpDelete("deleteinterest")]

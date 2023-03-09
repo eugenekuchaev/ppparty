@@ -1,18 +1,42 @@
+<form #form="ngForm" class="row mb-4" (ngSubmit)="loadMembers()" autocomplete="off">
+    <div class="col">
+        <input type="text" class="form-control ml-1" name="fullName" [(ngModel)]="userParams.fullName"
+            placeholder="Full name">
+    </div>
+    <div class="col">
+        <input type="text" class="form-control ml-1" name="username" [(ngModel)]="userParams.username"
+            placeholder="Username">
+    </div>
+    <div class="col">
+        <input type="text" class="form-control ml-1" name="country" [(ngModel)]="userParams.country"
+            placeholder="Country">
+    </div>
+    <div class="col">
+        <input type="text" class="form-control ml-1" name="region" [(ngModel)]="userParams.region" placeholder="Region">
+    </div>
+    <div class="col">
+        <input type="text" class="form-control ml-1" name="city" [(ngModel)]="userParams.city" placeholder="City">
+    </div>
+    <div class="col">
+        <input type="text" class="form-control ml-1" name="userInterest" [(ngModel)]="userParams.userInterest"
+            placeholder="Interest">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary ml-1" type="submit">Search</button>
+    </div>
+    <div class="col-auto">
+        <button (click)="resetFilters()" class="btn btn-info ml-1" type="submit">Reset</button>
+    </div>
+</form>
+
 <div class="row">
     <div *ngFor="let member of members" class="col-2">
         <app-member-card [member]="member"></app-member-card>
     </div>
 </div>
 <div class="d-flex justify-content-center" *ngIf="pagination">
-    <pagination 
-        [boundaryLinks]="true" 
-        [totalItems]="pagination.totalItems" 
-        [itemsPerPage]="pagination.itemsPerPage"
-        [(ngModel)]="pagination.currentPage"
-        (pageChanged)="pageChanged($event)"
-        previousText="&lsaquo;" 
-        nextText="&rsaquo;" 
-        firstText="&laquo;"
-        lastText="&raquo;">
+    <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems" [itemsPerPage]="pagination.itemsPerPage"
+        [(ngModel)]="pagination.currentPage" (pageChanged)="pageChanged($event)" previousText="&lsaquo;"
+        nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
     </pagination>
 </div>

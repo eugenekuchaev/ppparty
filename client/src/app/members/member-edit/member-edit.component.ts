@@ -51,6 +51,9 @@ export class MemberEditComponent implements OnInit {
       next: () => {
         this.toastr.success('Name updated');
         this.editNameForm.reset(this.member);
+      },
+      error: error => {
+        this.toastr.error("Full name must be from 3 to 32 characters");
       }
     })
   }
@@ -60,6 +63,9 @@ export class MemberEditComponent implements OnInit {
       next: () => {
         this.toastr.success('Location updated');
         this.editLocationForm.reset(this.member);
+      },
+      error: error => {
+        this.toastr.error("One of the fields is too long")
       }
     })
   }
@@ -69,6 +75,9 @@ export class MemberEditComponent implements OnInit {
       next: () => {
         this.toastr.success('About updated');
         this.editAboutForm.reset(this.member);
+      },
+      error: error => {
+        this.toastr.error("Your about is too long")
       }
     })
   }
@@ -101,6 +110,9 @@ export class MemberEditComponent implements OnInit {
             this.userInterests.push(newInterest);
           }
         })
+      },
+      error: error => {
+        this.toastr.error("You need to add interests, or one of them is too long");
       }
     })
   }
@@ -110,6 +122,9 @@ export class MemberEditComponent implements OnInit {
       next: () => {
         this.toastr.success('Contacts updated');
         this.editContactsForm.reset(this.member);
+      },
+      error: error => {
+        this.toastr.error("One of the fields is too long")
       }
     })
   }
