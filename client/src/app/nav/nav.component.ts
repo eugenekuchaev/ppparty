@@ -19,7 +19,9 @@ export class NavComponent implements OnInit {
   constructor(public accountService: AccountService, private router: Router,
     private memberService: MembersService) {
       this.accountService.currentUser$.pipe(take(1)).subscribe({
-        next: user => this.user = user
+        next: user => {
+          this.user = user;
+        }
       })
     }
 
@@ -44,6 +46,7 @@ export class NavComponent implements OnInit {
     this.memberService.getMember(this.user.username).subscribe({
       next: member => {
         this.member = member;
+        this.user.fullName = this.member.fullName;
       }
     })
   }

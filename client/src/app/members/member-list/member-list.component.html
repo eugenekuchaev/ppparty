@@ -1,42 +1,96 @@
-<form #form="ngForm" class="row mb-4" (ngSubmit)="loadMembers()" autocomplete="off">
-    <div class="col">
-        <input type="text" class="form-control ml-1" name="fullName" [(ngModel)]="userParams.fullName"
-            placeholder="Full name">
-    </div>
-    <div class="col">
-        <input type="text" class="form-control ml-1" name="username" [(ngModel)]="userParams.username"
-            placeholder="Username">
-    </div>
-    <div class="col">
-        <input type="text" class="form-control ml-1" name="country" [(ngModel)]="userParams.country"
-            placeholder="Country">
-    </div>
-    <div class="col">
-        <input type="text" class="form-control ml-1" name="region" [(ngModel)]="userParams.region" placeholder="Region">
-    </div>
-    <div class="col">
-        <input type="text" class="form-control ml-1" name="city" [(ngModel)]="userParams.city" placeholder="City">
-    </div>
-    <div class="col">
-        <input type="text" class="form-control ml-1" name="userInterest" [(ngModel)]="userParams.userInterest"
-            placeholder="Interest">
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-primary ml-1" type="submit">Search</button>
-    </div>
-    <div class="col-auto">
-        <button (click)="resetFilters()" class="btn btn-info ml-1" type="submit">Reset</button>
-    </div>
-</form>
-
 <div class="row">
-    <div *ngFor="let member of members" class="col-2">
-        <app-member-card [member]="member"></app-member-card>
+    <div class="col-2">
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item mb-1">
+                <div *ngIf="allMembersIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnAllMembers()">All members</a>
+                </div>
+                <div *ngIf="allMembersIsActivated == false">
+                    <a class="nav-link" (click)="clickOnAllMembers()">All members</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="friendsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnFriends()">Friends</a>
+                </div>
+                <div *ngIf="friendsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnFriends()">Friends</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="friendRequestsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnFriendRequests()">Friend requests</a>
+                </div>
+                <div *ngIf="friendRequestsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnFriendRequests()">Friend requests</a>
+                </div>
+            </li>
+            <li class="nav-item mt-3" *ngIf="allMembersIsActivated">
+                <div>
+                    <a class="nav-link dropdown-toggle" (click)="clickOnSearch()">Search</a>
+                </div>
+            </li>
+        </ul>
+
+        <div *ngIf="searchOpen == true">
+            <form #form="ngForm" class="row-1 mt-2" (ngSubmit)="loadMembers()" autocomplete="off">
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="fullName" [(ngModel)]="userParams.fullName"
+                        placeholder="Full name">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="username" [(ngModel)]="userParams.username"
+                        placeholder="Username">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="country" [(ngModel)]="userParams.country"
+                        placeholder="Country">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="region" [(ngModel)]="userParams.region"
+                        placeholder="Region">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="city" [(ngModel)]="userParams.city"
+                        placeholder="City">
+                </div>
+                <div class="col mb-3">
+                    <input type="text" class="form-control ml-1" name="userInterest" [(ngModel)]="userParams.userInterest"
+                        placeholder="Interest">
+                </div>
+                <div class="col-auto d-grid gap-2">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button (click)="resetFilters()" class="btn btn-secondary" type="submit">Reset</button>
+                </div>
+            </form>
+        </div>
+
+        
     </div>
-</div>
-<div class="d-flex justify-content-center" *ngIf="pagination">
-    <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems" [itemsPerPage]="pagination.itemsPerPage"
-        [(ngModel)]="pagination.currentPage" (pageChanged)="pageChanged($event)" previousText="&lsaquo;"
-        nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
-    </pagination>
+
+    <div class="col">
+        <div *ngIf="allMembersIsActivated == true">
+
+
+            <div class="row">
+                <div *ngFor="let member of members" class="col-2">
+                    <app-member-card [member]="member"></app-member-card>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center" *ngIf="pagination">
+                <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems"
+                    [itemsPerPage]="pagination.itemsPerPage" [(ngModel)]="pagination.currentPage"
+                    (pageChanged)="pageChanged($event)" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;"
+                    lastText="&raquo;">
+                </pagination>
+            </div>
+        </div>
+        <div *ngIf="friendsIsActivated == true">
+            Friends
+        </div>
+        <div *ngIf="friendRequestsIsActivated == true">
+            Friend requests
+        </div>
+    </div>
 </div>

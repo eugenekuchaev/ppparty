@@ -17,16 +17,16 @@ export class MemberCardComponent implements OnInit {
   }
 
   shortenFullName() {
-    if (this.member.fullName.length > 19) {
-      this.shortenedMemberFullName = this.member.fullName.substring(0, 19) + "...";
+    if (this.member.fullName.length > 14) {
+      this.shortenedMemberFullName = this.member.fullName.substring(0, 14) + "...";
     } else {
       this.shortenedMemberFullName = this.member.fullName;
     }
   }
 
   shortenCity() {
-    if (this.member.city.length > 17) {
-      this.shortenedMemberCity = this.member.city.substring(0, 17) + "...";
+    if (this.member.city.length > 14) {
+      this.shortenedMemberCity = this.member.city.substring(0, 14) + "...";
     } else {
       this.shortenedMemberCity = this.member.city;
     }

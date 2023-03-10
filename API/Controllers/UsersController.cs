@@ -38,8 +38,6 @@ namespace API.Controllers
 			var users = await _userRepository.GetMembersAsync(userParams);
 			
 			Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
-			
-			await Task.Delay(1000);
 
 			return Ok(users);
 		}
@@ -47,8 +45,6 @@ namespace API.Controllers
 		[HttpGet("{username}", Name = "GetUser")]
 		public async Task<ActionResult<MemberDto?>> GetUser(string username)
 		{
-			await Task.Delay(1000);
-			
 			return await _userRepository.GetMemberAsync(username);
 		}
 
