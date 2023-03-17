@@ -112,9 +112,6 @@ export class MemberEditComponent implements OnInit {
             this.userInterests.push(newInterest);
           }
         })
-      },
-      error: error => {
-        this.toastr.error("You need to add interests, or one of them is too long");
       }
     })
   }

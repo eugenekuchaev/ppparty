@@ -1,12 +1,43 @@
 <div class="card mb-4">
     <div class="card-img-wrapper">
-        <img src="{{member.userPhotoUrl || './assets/user.png'}}" alt="{{member.fullName}}" class="card-img-top"
-            routerLink="/members/{{member.username}}">
-        <ul class="list-inline member-icons animate text-center">
-            <li class="list-inline-item">
-                <button class="btn btn-success">Add to friends</button>
-            </li>
-        </ul>
+        <div *ngIf="member">
+            <img src="{{member.userPhotoUrl || './assets/user.png'}}" alt="{{member.fullName}}" class="card-img-top"
+                routerLink="/members/{{member.username}}">
+            <ul class="list-inline member-icons animate text-center">
+                <li class="list-inline-item">
+                    <button 
+                        class="btn btn-sm btn-success" 
+                        *ngIf="isMemberInAddedToFriends() === false && isMemberSentAFriendRequest() === false && isMemberAMutualFriend() == false" 
+                        (click)="addFriend(member)">
+                            Add to friends
+                    </button>
+                    <button 
+                        class="btn btn-sm btn-success" 
+                        *ngIf="isMemberInAddedToFriends() === false && isMemberSentAFriendRequest() === true" 
+                        (click)="addFriend(member)">
+                            Accept request
+                    </button>
+                    <button 
+                        class="btn btn-sm btn-danger" 
+                        *ngIf="isMemberInAddedToFriends() === true && isMemberAMutualFriend() === false" 
+                        (click)="deleteFriend(member)">
+                            Cancel request
+                    </button>
+                    <div *ngIf="isMemberAMutualFriend() === true">
+                        <button class="btn btn-sm btn-success">
+                            <i class="fa fa-envelope"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" *ngIf="isMemberAMutualFriend() === true">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" *ngIf="isMemberAMutualFriend() === true" (click)="deleteFriend(member)">
+                            <i class="fa fa-remove"></i>
+                        </button>
+                    </div>
+                   
+                </li>
+            </ul>
+        </div>
     </div>
     <div class="card-body p-1">
         <h6 class="card-title text-center mb-1 mt-1"><i class="fa fa-user mr-2"></i>

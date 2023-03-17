@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { Member } from 'src/app/_models/member';
 import { Pagination } from 'src/app/_models/pagination';
 import { User } from 'src/app/_models/user';
@@ -12,6 +13,9 @@ import { MembersService } from 'src/app/_services/members.service';
 })
 export class MemberListComponent implements OnInit {
   members: Member[];
+  mutualFriends: Partial<Member[]>;
+  friendRequests: Partial<Member[]>;
+  addedToFriends: Partial<Member[]>;
   pagination: Pagination;
   userParams: UserParams;
   user: User;
@@ -25,7 +29,18 @@ export class MemberListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadMembers();
+    forkJoin({
+      mutualFriends: this.membersService.getFriends("mutualfriends"),
+      friendRequests: this.membersService.getFriends("friendrequests"),
+      addedToFriends: this.membersService.getFriends("addedtofriends")
+    }).subscribe({
+      next: response => {
+        this.loadMembers();
+        this.mutualFriends = response.mutualFriends;
+        this.friendRequests = response.friendRequests.filter(fr => !this.mutualFriends.some(mutual => mutual.id === fr.id));
+        this.addedToFriends = response.addedToFriends;
+      }
+    });
   }
 
   loadMembers() {
@@ -34,6 +49,30 @@ export class MemberListComponent implements OnInit {
       next: response => {
         this.members = response.result;
         this.pagination = response.pagination;
+      }
+    })
+  }
+
+  loadMutualFriends() {
+    this.membersService.getFriends("mutualfriends").subscribe({
+      next: response => {
+        this.mutualFriends = response;
+      }
+    })
+  }
+
+  loadFriendRequests() {
+    this.membersService.getFriends("friendrequests").subscribe({
+      next: response => {
+        this.friendRequests = response.filter(fr => !this.mutualFriends.some(mutual => mutual.id === fr.id));
+      }
+    })
+  }
+
+  loadAddedToFriends() {
+    this.membersService.getFriends("addedtofriends").subscribe({
+      next: response => {
+        this.addedToFriends = response;
       }
     })
   }

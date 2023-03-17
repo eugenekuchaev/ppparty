@@ -32,7 +32,7 @@
             </li>
         </ul>
 
-        <div *ngIf="searchOpen == true">
+        <div *ngIf="searchOpen == true && allMembersIsActivated">
             <form #form="ngForm" class="row-1 mt-2" (ngSubmit)="loadMembers()" autocomplete="off">
                 <div class="col mb-2">
                     <input type="text" class="form-control ml-1" name="fullName" [(ngModel)]="userParams.fullName"
@@ -55,8 +55,8 @@
                         placeholder="City">
                 </div>
                 <div class="col mb-3">
-                    <input type="text" class="form-control ml-1" name="userInterest" [(ngModel)]="userParams.userInterest"
-                        placeholder="Interest">
+                    <input type="text" class="form-control ml-1" name="userInterest"
+                        [(ngModel)]="userParams.userInterest" placeholder="Interest">
                 </div>
                 <div class="col-auto d-grid gap-2">
                     <button class="btn btn-primary" type="submit">Search</button>
@@ -64,17 +64,18 @@
                 </div>
             </form>
         </div>
-
-        
     </div>
 
     <div class="col">
         <div *ngIf="allMembersIsActivated == true">
-
-
             <div class="row">
                 <div *ngFor="let member of members" class="col-2">
-                    <app-member-card [member]="member"></app-member-card>
+                    <app-member-card 
+                        [member]="member" 
+                        [addedToFriends]="addedToFriends"
+                        [friendRequests]="friendRequests"
+                        [mutualFriends]="mutualFriends">
+                    </app-member-card>
                 </div>
             </div>
 
@@ -86,11 +87,31 @@
                 </pagination>
             </div>
         </div>
+        
         <div *ngIf="friendsIsActivated == true">
-            Friends
+            <div class="row">
+                <div *ngFor="let member of mutualFriends" class="col-2">
+                    <app-member-card 
+                        [member]="member" 
+                        [addedToFriends]="addedToFriends"
+                        [friendRequests]="friendRequests"
+                        [mutualFriends]="mutualFriends">
+                    </app-member-card>
+                </div>
+            </div>
         </div>
+
         <div *ngIf="friendRequestsIsActivated == true">
-            Friend requests
+            <div class="row">
+                <div *ngFor="let member of friendRequests" class="col-2">
+                    <app-member-card 
+                        [member]="member" 
+                        [addedToFriends]="addedToFriends"
+                        [friendRequests]="friendRequests"
+                        [mutualFriends]="mutualFriends">
+                    </app-member-card>
+                </div>
+            </div>
         </div>
     </div>
 </div>
