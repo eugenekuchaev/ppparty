@@ -67,7 +67,7 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to update user.");
+			return BadRequest("Failed to update user");
 		}
 
 		[HttpPut("updatelocation")]
@@ -96,7 +96,7 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to update user.");
+			return BadRequest("Failed to update user");
 		}
 		
 		[HttpPut("updateAbout")]
@@ -118,7 +118,7 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to update user.");
+			return BadRequest("Failed to update user");
 		}
 
 		[HttpPost("addinterests")]
@@ -179,7 +179,7 @@ namespace API.Controllers
 
 			if (userInterest == null)
 			{
-				return BadRequest("There's no interest with this name.");
+				return BadRequest("There's no interest with this name");
 			}
 
 			user!.UserInterests?.Remove(userInterest);
@@ -189,7 +189,7 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to delete interest.");
+			return BadRequest("Failed to delete interest");
 		}
 
 		[HttpPut("updatecontacts")]
@@ -241,7 +241,7 @@ namespace API.Controllers
 				return CreatedAtRoute("GetUser", new { Username = user!.UserName }, _mapper.Map<UserPhotoDto>(photo));
 			}
 			
-			return BadRequest("Problem adding photo.");
+			return BadRequest("Problem adding photo");
 		}
 	}
 }

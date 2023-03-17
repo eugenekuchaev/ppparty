@@ -8,7 +8,7 @@ export class UserParams {
     city: string;
     userInterest: string;
     pageNumber = 1;
-    pageSize = 6;
+    pageSize = 12;
 
     constructor(user: User) {}
 }

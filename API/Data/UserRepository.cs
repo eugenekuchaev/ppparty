@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using API.DTOs;
 using API.Entities;
 using API.Helpers;
@@ -9,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-	public class UserRepository : IUserRepository
+    public class UserRepository : IUserRepository
 	{
 		private readonly DataContext _context;
 		private readonly IMapper _mapper;

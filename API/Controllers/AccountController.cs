@@ -30,7 +30,7 @@ namespace API.Controllers
 		{
 			if (await UserExists(registerDto.Username))
 			{
-				return BadRequest("Username is taken.");
+				return BadRequest("Username is taken");
 			}
 			
 			var user = _mapper.Map<AppUser>(registerDto);
