@@ -24,7 +24,7 @@
                             Cancel request
                     </button>
                     <div *ngIf="isMemberAMutualFriend() === true">
-                        <button class="btn btn-sm btn-success">
+                        <button class="btn btn-sm btn-success" routerLink="/messages/{{member.username}}">
                             <i class="fa fa-envelope"></i>
                         </button>
                         <button class="btn btn-sm btn-primary" *ngIf="isMemberAMutualFriend() === true">

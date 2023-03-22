@@ -1,1 +1,24 @@
-<p>messages works!</p>
+<div class="row d-flex justify-content-center">
+    <div class="col-9">
+        <table class="table">
+            <tbody>
+                <tr *ngFor="let conversation of conversations" (click)="onRowClicked(conversation.friendUsername)">
+                    <td class="align-middle col-3">
+                        <img class="img-circle rounded-circle me-2" src="{{conversation.friendPhotoUrl}}"
+                            alt="{{conversation.friendFullName}}">
+                        <strong>{{conversation.friendFullName | titlecase}}</strong>
+                    </td>
+                    <td class="align-middle col-7">
+                        <span class="lastMessageAuthorName">{{conversation.lastMessageAuthorName}}:</span>
+                        {{shortenMessage(conversation.lastMessageContent)}}
+                    </td>
+                    <td class="align-middle col-2">{{conversation.lastMessageSent | timeago}}</td>
+                    <td class="align-middle col-1"
+                        [ngClass]="{'text-success': conversation.lastMessageRead, 'text-warning': !conversation.lastMessageRead}">
+                        {{conversation.lastMessageRead == null ? 'Unread' : 'Read'}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

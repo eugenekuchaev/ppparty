@@ -47,3 +47,7 @@ body{
 .fa-globe {
     color: #dd4b39;
 }
+
+.btn {
+    margin-inline: 10px;
+}

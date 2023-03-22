@@ -24,6 +24,10 @@ import { MemberEditComponent } from './members/member-edit/member-edit.component
 import { MemberSecurityComponent } from './members/member-security/member-security.component';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { TextInputComponent } from './_forms/text-input/text-input.component';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+import { TimeagoModule } from 'ngx-timeago';
+import { CustomTimeagoPipe } from './timeago.pipe';
+import { MemberMessagesComponent } from './messages/member-messages/member-messages.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +46,9 @@ import { TextInputComponent } from './_forms/text-input/text-input.component';
     MemberEditComponent,
     MemberSecurityComponent,
     PhotoEditorComponent,
-    TextInputComponent
+    TextInputComponent,
+    CustomTimeagoPipe,
+    MemberMessagesComponent
   ],
   imports: [
     BrowserModule,
@@ -51,7 +57,9 @@ import { TextInputComponent } from './_forms/text-input/text-input.component';
     BrowserAnimationsModule,
     FormsModule,
     SharedModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ButtonsModule.forRoot(),
+    TimeagoModule.forRoot()
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},

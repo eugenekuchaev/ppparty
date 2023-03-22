@@ -39,5 +39,7 @@ namespace API.Entities
 		public ICollection<UserInterest>? UserInterests { get; set; }
 		public ICollection<AppUserFriend>? AddedToFriendsByUsers { get; set; }
 		public ICollection<AppUserFriend>? AddedToFriendsUsers { get; set; }
+		public ICollection<Message>? MessagesSent { get; set; }
+		public ICollection<Message>? MessagesRecieved { get; set; }
 	}
 }

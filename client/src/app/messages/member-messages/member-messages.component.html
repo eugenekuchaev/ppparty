@@ -1,0 +1,56 @@
+<div class="row d-flex justify-content-center mb-5">
+    <div class="card col-6 display-inline">
+        <div class="card-body">
+            <div *ngIf="messages?.length === 0">
+                No messages yet... say hi by using the message box below
+            </div>
+
+            <div class="mb-4">
+                <form #messageForm="ngForm" (ngSubmit)="sendMessage()" autocomplete="off">
+                    <div class="input-group">
+                        <input name="messageContent" required [(ngModel)]="messageContent" type="text"
+                            class="form-control input-sm" placeholder="Send a private message">
+                        <div class="input-group-append">
+                            <button [disabled]="!messageForm.valid" class="btn btn-primary" type="submit">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <ul *ngIf="messages?.length > 0" class="chat">
+                <li *ngFor="let message of messages">
+                    <div class="message-container">
+                        <div class="chat-img float-left">
+                            <img class="rounded-circle" src="{{message.senderPhotoUrl}}"
+                                alt="{{message.senderUsername}}">
+                        </div>
+                        <div class="chat-body">
+                            <div class="header">
+                                <small class="text-muted">
+                                    <span style="font-weight: bold; color: black;">{{message.senderFullName}} </span>
+                                    <span>{{message.messageSent | timeago}}</span>
+                                    <span class="text-warning" *ngIf="!message.dateRead 
+                                        && message.senderUsername !== username">
+                                        (unread)
+                                    </span>
+                                    <span class="text-success" *ngIf="message.dateRead 
+                                        && message.senderUsername !== username">
+                                        (read {{message.dateRead | timeago}})
+                                    </span>
+                                </small>
+                            </div>
+                            <p>{{message.content}}</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex justify-content-center mb-2" *ngIf="pagination">
+            <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems"
+                [itemsPerPage]="pagination.itemsPerPage" [(ngModel)]="pagination.currentPage"
+                (pageChanged)="pageChanged($event)" [maxSize]="10" previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;">
+            </pagination>
+        </div>
+    </div>
+</div>

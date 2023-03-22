@@ -9,6 +9,7 @@ import { MemberDetailComponent } from './members/member-detail/member-detail.com
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { MemberListComponent } from './members/member-list/member-list.component';
 import { MemberSecurityComponent } from './members/member-security/member-security.component';
+import { MemberMessagesComponent } from './messages/member-messages/member-messages.component';
 import { MessagesComponent } from './messages/messages.component';
 import { AuthGuard } from './_guards/auth.guard';
 
@@ -24,7 +25,8 @@ const routes: Routes = [
       {path: 'members/:username', component: MemberDetailComponent},
       {path: 'member/edit', component: MemberEditComponent},
       {path: 'messages', component: MessagesComponent},
-      {path: 'member/security', component: MemberSecurityComponent}
+      {path: 'member/security', component: MemberSecurityComponent},
+      {path: 'messages/:username', component: MemberMessagesComponent}
     ]
   },
   {path: 'errors', component: TestErrorsComponent}, 

@@ -25,6 +25,7 @@ namespace API.Extensions
 
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<IFriendsRepository, FriendsRepository>();
+			services.AddScoped<IMessageRepository, MessageRepository>();
 			
 			services.AddScoped<LinkTransformer>();
 			

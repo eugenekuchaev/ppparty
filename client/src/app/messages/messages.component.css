@@ -1,0 +1,15 @@
+.img-circle {
+    max-height: 50px;
+}
+
+i {
+    margin-right: 5px;
+}
+
+.lastMessageAuthorName {
+    color: black;
+}
+
+tr {
+    cursor: pointer;
+}
