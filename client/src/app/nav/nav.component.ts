@@ -17,16 +17,17 @@ export class NavComponent implements OnInit {
   user: User;
 
   constructor(public accountService: AccountService, private router: Router,
-    private memberService: MembersService) {
-      this.accountService.currentUser$.pipe(take(1)).subscribe({
-        next: user => {
-          this.user = user;
-        }
-      })
-    }
+    private memberService: MembersService) { }
 
   ngOnInit(): void {
-    this.loadMember();
+    this.accountService.currentUser$.subscribe({
+      next: user => {
+        if (user) {
+          this.user = user;
+          this.loadMember();
+        }
+      }
+    });
   }
 
   login() {

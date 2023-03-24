@@ -1,17 +1,13 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace API.Entities
 {
-	public class AppUser
+	public class AppUser : IdentityUser<int>
 	{
-		public int Id { get; set; }
-
 		// Registration properties
 		public string FullName { get; set; } = null!;
-		public string UserName { get; set; } = null!;
-		public string Email { get; set; } = null!;
 		public bool ShowEmail { get; set; }
-		public byte[] PasswordHash { get; set; } = null!;
-		public byte[] PasswordSalt { get; set; } = null!;
-
+		
 		// Location properties
 		public string? Country { get; set; }	
 		public string? Region { get; set; }
@@ -21,7 +17,6 @@ namespace API.Entities
 		public string? About { get; set; }
 
 		// Contacts properties
-		public string? PhoneNumber { get; set; }
 		public string? FacebookLink { get; set; }
 		public string? InstagramLink { get; set; }
 		public string? TwitterLink { get; set; }
@@ -41,5 +36,6 @@ namespace API.Entities
 		public ICollection<AppUserFriend>? AddedToFriendsUsers { get; set; }
 		public ICollection<Message>? MessagesSent { get; set; }
 		public ICollection<Message>? MessagesRecieved { get; set; }
+		public ICollection<AppUserRole> UserRoles { get; set; } = null!;
 	}
 }

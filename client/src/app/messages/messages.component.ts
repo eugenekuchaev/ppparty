@@ -9,7 +9,7 @@ import { MessageService } from '../_services/message.service';
   styleUrls: ['./messages.component.css']
 })
 export class MessagesComponent implements OnInit {
-  conversations: Conversation[];
+  conversations: Conversation[] = [];
 
   constructor(private messageService: MessageService, private router: Router) {}
 
