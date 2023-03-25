@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+.member-tabset>.nav-tabs>li.active>a {
+    border: 0 !important;
+    color: #333333;
+}
+
+.member-tabset>.tab-content {
+    margin-top: -3px;
+    background-color: #fff;
+    border: 0;
+    border-top: 1px solid #eee;
+    padding: 15px 0;
+}
