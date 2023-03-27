@@ -6,6 +6,7 @@ import { Pagination } from 'src/app/_models/pagination';
 import { UserParams } from 'src/app/_models/userParams';
 import { MembersService } from 'src/app/_services/members.service';
 import { MessageService } from 'src/app/_services/message.service';
+import { PresenceService } from 'src/app/_services/presence.service';
 
 @Component({
   selector: 'app-member-messages',
@@ -23,7 +24,7 @@ export class MemberMessagesComponent implements OnInit{
   pageSize = 5;
 
   constructor(private messageService: MessageService, private route: ActivatedRoute,
-    private membersService: MembersService) {
+    private membersService: MembersService, public presence: PresenceService) {
       this.userParams = this.membersService.getUserParams();
     }
 

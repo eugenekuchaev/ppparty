@@ -8,8 +8,19 @@
             <tbody>
                 <tr *ngFor="let conversation of conversations" (click)="onRowClicked(conversation.friendUsername)">
                     <td class="align-middle col-3">
-                        <img class="img-circle rounded-circle me-2" src="{{conversation.friendPhotoUrl}}"
+                        <!-- <img class="img-circle rounded-circle me-2" src="{{conversation.friendPhotoUrl}}"
                             alt="{{conversation.friendFullName}}">
+                        <div class="green-circle"></div> -->
+                        <div class="image-container" *ngIf="(presence.onlineUsers$ | async).includes(conversation.friendUsername)">
+                            <img class="img-circle rounded-circle me-2" src="{{conversation.friendPhotoUrl}}"
+                                alt="{{conversation.friendFullName}}">
+                            <div class="green-circle"></div>
+                        </div>
+                        <div class="image-container" *ngIf="!(presence.onlineUsers$ | async).includes(conversation.friendUsername)">
+                            <img class="img-circle rounded-circle me-2" src="{{conversation.friendPhotoUrl}}"
+                                alt="{{conversation.friendFullName}}">
+                            <div class="grey-circle"></div>
+                        </div>
                         <strong>{{conversation.friendFullName | titlecase}}</strong>
                     </td>
                     <td class="align-middle col-7">

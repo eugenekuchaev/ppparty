@@ -73,3 +73,28 @@
 .chat-body p {
     margin-bottom: 0;
 }
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.green-circle {
+    position: absolute;
+    bottom: 1px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(0, 196, 0);
+    border-radius: 50%;
+}
+
+.grey-circle {
+    position: absolute;
+    bottom: 1px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(143, 143, 143);
+    border-radius: 50%;
+}

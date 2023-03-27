@@ -20,14 +20,27 @@
             <ul *ngIf="messages?.length > 0" class="chat">
                 <li *ngFor="let message of messages">
                     <div class="message-container">
-                        <div class="chat-img float-left">
+                        <!-- <div class="chat-img float-left">
                             <img class="rounded-circle" src="{{message.senderPhotoUrl}}"
                                 alt="{{message.senderUsername}}">
+                        </div> -->
+                        <div class="image-container chat-img" *ngIf="(presence.onlineUsers$ | async).includes(message.senderUsername)">
+                            <img class="img-circle rounded-circle me-2" src="{{message.senderPhotoUrl}}"
+                                alt="{{message.senderFullName}}">
+                            <div class="green-circle"></div>
+                        </div>
+                        <div class="image-container chat-img" *ngIf="!(presence.onlineUsers$ | async).includes(message.senderUsername)">
+                            <img class="img-circle rounded-circle me-2" src="{{message.senderPhotoUrl}}"
+                                alt="{{message.senderFullName}}">
+                            <div class="grey-circle"></div>
                         </div>
                         <div class="chat-body">
                             <div class="header">
                                 <small class="text-muted">
-                                    <span style="font-weight: bold; color: black;">{{message.senderFullName}} </span>
+                                    <span 
+                                        style="font-weight: bold; color: black; margin-right: 5px;">
+                                        {{message.senderFullName}} 
+                                    </span>
                                     <span>{{message.messageSent | timeago}}</span>
                                     <span class="text-warning" *ngIf="!message.dateRead 
                                         && message.senderUsername !== username">

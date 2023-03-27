@@ -39,3 +39,7 @@
 .btn {
     margin-inline: 7px;
 }
+
+.is-online {
+    color: rgb(1, 189, 42);
+}
