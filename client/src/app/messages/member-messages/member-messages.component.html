@@ -1,7 +1,7 @@
 <div class="row d-flex justify-content-center mb-5">
     <div class="card col-6 display-inline">
         <div class="card-body">
-            <div *ngIf="messages?.length === 0" class="mb-3">
+            <div *ngIf="(messageService.messageThread$ | async)?.length === 0" class="mb-3">
                 No messages yet... say hi by using the message box below
             </div>
 
@@ -17,13 +17,9 @@
                 </form>
             </div>
 
-            <ul *ngIf="messages?.length > 0" class="chat">
-                <li *ngFor="let message of messages">
+            <ul *ngIf="(messageService.messageThread$ | async)?.length > 0" class="chat">
+                <li *ngFor="let message of (messageService.messageThread$ | async)">
                     <div class="message-container">
-                        <!-- <div class="chat-img float-left">
-                            <img class="rounded-circle" src="{{message.senderPhotoUrl}}"
-                                alt="{{message.senderUsername}}">
-                        </div> -->
                         <div class="image-container chat-img" *ngIf="(presence.onlineUsers$ | async).includes(message.senderUsername)">
                             <img class="img-circle rounded-circle me-2" src="{{message.senderPhotoUrl}}"
                                 alt="{{message.senderFullName}}">
@@ -58,12 +54,12 @@
                 </li>
             </ul>
         </div>
-        <div class="d-flex justify-content-center mb-2" *ngIf="pagination">
+        <!-- <div class="d-flex justify-content-center mb-2" *ngIf="pagination">
             <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems"
                 [itemsPerPage]="pagination.itemsPerPage" [(ngModel)]="pagination.currentPage"
                 (pageChanged)="pageChanged($event)" [maxSize]="10" previousText="&lsaquo;" nextText="&rsaquo;"
                 firstText="&laquo;" lastText="&raquo;">
             </pagination>
-        </div>
+        </div> -->
     </div>
 </div>

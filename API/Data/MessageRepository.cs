@@ -3,12 +3,11 @@ using API.Entities;
 using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-	public class MessageRepository : IMessageRepository
+    public class MessageRepository : IMessageRepository
 	{
 		private readonly DataContext _context;
 		private readonly IMapper _mapper;
@@ -34,7 +33,7 @@ namespace API.Data
 			return await _context.Messages.FindAsync(id);
 		}
 
-		public async Task<PagedList<MessageDto>> GetMessageThread(UserParams userParams, 
+		public async Task<PagedList<MessageDto>> GetMessageThread(UserParams userParams,
 			string currentUsername, string recipientUsername)
 		{
 			var messages = await _context.Messages
@@ -63,9 +62,39 @@ namespace API.Data
 			}
 
 			var mappedMessages = _mapper.Map<IEnumerable<MessageDto>>(messages).AsQueryable();
-			
+
 			return PagedList<MessageDto>.Create(mappedMessages, userParams.PageNumber, userParams.PageSize);
 		}
+
+        public async Task<IEnumerable<MessageDto>> GetMessageThreadWithoutParams(string currentUsername, 
+            string recipientUsername)
+        {
+            var messages = await _context.Messages
+                .Include(u => u.Sender).ThenInclude(p => p.UserPhoto)
+                .Include(u => u.Recipient).ThenInclude(p => p.UserPhoto)
+                .Where(m => m.Recipient.UserName == currentUsername && m.RecipientDeleted == false
+                        && m.Sender.UserName == recipientUsername
+                        || m.Recipient.UserName == recipientUsername
+                        && m.Sender.UserName == currentUsername && m.SenderDeleted == false
+                )
+                .OrderByDescending(m => m.MessageSent)
+                .ToListAsync();
+
+            var unreadMessages = messages.Where(m => m.DateRead == null 
+                && m.Recipient.UserName == currentUsername).ToList();
+
+            if (unreadMessages.Any())
+            {
+                foreach (var message in unreadMessages)
+                {
+                    message.DateRead = DateTime.UtcNow;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return _mapper.Map<IEnumerable<MessageDto>>(messages);
+        }
 
 		public async Task<bool> SaveAllAsync()
 		{
@@ -110,6 +139,36 @@ namespace API.Data
 				})
 				.OrderByDescending(c => c.LastMessageSent)
 				.ToListAsync();
+		}
+
+		public void AddGroup(Group group)
+		{
+			_context.Groups.Add(group);
+		}
+
+		public void RemoveConnection(Connection connection)
+		{
+			_context.Connections.Remove(connection);
+		}
+
+		public async Task<Connection?> GetConnection(string connectionId)
+		{
+			return await _context.Connections.FindAsync(connectionId);
+		}
+
+		public async Task<Group?> GetMessageGroup(string groupName)
+		{
+			return await _context.Groups
+				.Include(x => x.Connections)
+				.FirstOrDefaultAsync(x => x.GroupName == groupName);
+		}
+
+		public async Task<Group?> GetGroupForConnection(string connectionId)
+		{
+			return await _context.Groups
+				.Include(c => c.Connections)
+				.Where(c => c.Connections.Any(x => x.ConnectionId == connectionId))
+				.FirstOrDefaultAsync();
 		}
 	}
 }

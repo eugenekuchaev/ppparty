@@ -1,9 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { take } from 'rxjs';
 import { Message } from 'src/app/_models/message';
 import { Pagination } from 'src/app/_models/pagination';
+import { User } from 'src/app/_models/user';
 import { UserParams } from 'src/app/_models/userParams';
+import { AccountService } from 'src/app/_services/account.service';
 import { MembersService } from 'src/app/_services/members.service';
 import { MessageService } from 'src/app/_services/message.service';
 import { PresenceService } from 'src/app/_services/presence.service';
@@ -13,7 +16,7 @@ import { PresenceService } from 'src/app/_services/presence.service';
   templateUrl: './member-messages.component.html',
   styleUrls: ['./member-messages.component.css']
 })
-export class MemberMessagesComponent implements OnInit{
+export class MemberMessagesComponent implements OnInit, OnDestroy {
   @ViewChild('messageForm') messageForm: NgForm;
   username: string;
   messages: Message[];
@@ -22,44 +25,30 @@ export class MemberMessagesComponent implements OnInit{
   userParams: UserParams;
   pageNumber = 1;
   pageSize = 5;
+  user: User;
 
-  constructor(private messageService: MessageService, private route: ActivatedRoute,
-    private membersService: MembersService, public presence: PresenceService) {
-      this.userParams = this.membersService.getUserParams();
-    }
+  constructor(public messageService: MessageService, private route: ActivatedRoute,
+    private membersService: MembersService, public presence: PresenceService, private accountService: AccountService) {
+    this.userParams = this.membersService.getUserParams();
+    this.accountService.currentUser$.pipe(take(1)).subscribe({
+      next: user => this.user = user
+    })
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.username = params.get('username');
-      this.loadMessages();
+      this.messageService.createHubConnection(this.user, this.username);
     });
   }
-  
 
-  loadMessages() {
-    this.membersService.setUserParams(this.userParams);
-    this.messageService.getMessageThread(this.userParams, this.route.snapshot.paramMap.get('username')).subscribe({
-      next: messages => {
-        this.messages = messages.result;
-        this.pagination = messages.pagination;
-      }
-    })
+  ngOnDestroy(): void {
+    this.messageService.stopHubConnection();
   }
 
   sendMessage() {
-    this.messageService.sendMessage(this.username, this.messageContent).subscribe({
-      next: message => {
-        if (this.pagination.currentPage === 1){
-          this.messages.unshift(message);
-        }
-        this.messageForm.reset();
-      }
+    this.messageService.sendMessage(this.username, this.messageContent).then(() => {
+      this.messageForm.reset();
     })
-  }
-
-  pageChanged(event: any) {
-    this.userParams.pageNumber = event.page;
-    this.membersService.setUserParams(this.userParams);
-    this.loadMessages();
   }
 }
