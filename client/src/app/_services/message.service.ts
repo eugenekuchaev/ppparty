@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject, take } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { Conversation } from '../_models/conversation';
@@ -23,7 +24,7 @@ export class MessageService {
   private messageThreadSource = new BehaviorSubject<Message[]>([]);
   messageThread$ = this.messageThreadSource.asObservable();
 
-  constructor(private http: HttpClient, private accountService: AccountService) { 
+  constructor(private http: HttpClient, private accountService: AccountService, private toastr: ToastrService) { 
     this.accountService.currentUser$.pipe(take(1)).subscribe({
       next: user => {
         this.user = user;
@@ -104,6 +105,9 @@ export class MessageService {
 
   async sendMessage(username: string, content: string) {
     return this.hubConnection.invoke("SendMessage", {recipientUsername: username, content})
-      .catch(error => console.log(error));
+      .catch(error => {
+        console.log(error);
+        this.toastr.error("You can send messages only to friends");
+      });
   }
 }

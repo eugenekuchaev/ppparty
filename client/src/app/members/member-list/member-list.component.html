@@ -9,20 +9,20 @@
                     <a class="nav-link" (click)="clickOnAllMembers()">All members</a>
                 </div>
             </li>
-            <li class="nav-item mb-1">
+            <li class="nav-item mb-1" *ngIf="mutualFriends">
                 <div *ngIf="friendsIsActivated == true">
-                    <a class="nav-link active" (click)="clickOnFriends()">Friends</a>
+                    <a class="nav-link active" (click)="clickOnFriends()">Friends ({{mutualFriends.length}})</a>
                 </div>
                 <div *ngIf="friendsIsActivated == false">
-                    <a class="nav-link" (click)="clickOnFriends()">Friends</a>
+                    <a class="nav-link" (click)="clickOnFriends()">Friends ({{mutualFriends.length}})</a>
                 </div>
             </li>
-            <li class="nav-item mb-1">
+            <li class="nav-item mb-1" *ngIf="friendRequests">
                 <div *ngIf="friendRequestsIsActivated == true">
-                    <a class="nav-link active" (click)="clickOnFriendRequests()">Friend requests</a>
+                    <a class="nav-link active" (click)="clickOnFriendRequests()">Friend requests ({{friendRequests.length}})</a>
                 </div>
                 <div *ngIf="friendRequestsIsActivated == false">
-                    <a class="nav-link" (click)="clickOnFriendRequests()">Friend requests</a>
+                    <a class="nav-link" (click)="clickOnFriendRequests()">Friend requests ({{friendRequests.length}})</a>
                 </div>
             </li>
             <li class="nav-item mt-3" *ngIf="allMembersIsActivated">

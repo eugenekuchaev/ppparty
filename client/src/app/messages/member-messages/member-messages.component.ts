@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs';
 import { Message } from 'src/app/_models/message';
 import { Pagination } from 'src/app/_models/pagination';

@@ -1,9 +1,11 @@
+using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.SignalR
 {
@@ -14,10 +16,12 @@ namespace API.SignalR
 		private readonly IUserRepository _userRepository;
 		private readonly IHubContext<PresenceHub> _presenceHub;
 		private readonly PresenceTracker _tracker;
+		private readonly DataContext _context;
 
 		public MessageHub(IMessageRepository messageRepository, IMapper mapper, IUserRepository userRepository,
-			IHubContext<PresenceHub> presenceHub, PresenceTracker tracker)
+			IHubContext<PresenceHub> presenceHub, PresenceTracker tracker, DataContext context)
 		{
+			_context = context;
 			_tracker = tracker;
 			_presenceHub = presenceHub;
 			_userRepository = userRepository;
@@ -38,6 +42,8 @@ namespace API.SignalR
 			var messages = await _messageRepository.GetMessageThreadWithoutParams(Context.User!.GetUsername(), otherUser!);
 
 			await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
+
+			SendUpdateConversations(otherUser!);
 		}
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
@@ -49,6 +55,7 @@ namespace API.SignalR
 
 		public async Task SendMessage(CreateMessageDto createMessageDto)
 		{
+
 			var username = Context.User!.GetUsername();
 
 			if (username == createMessageDto.RecipientUsername?.ToLower())
@@ -58,6 +65,17 @@ namespace API.SignalR
 
 			var sender = await _userRepository.GetUserByUsernameAsync(username);
 			var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername!);
+
+			var senderFriendship = await _context.Friends
+				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == sender!.Id && f.AddedToFriendsUserId == recipient!.Id);
+
+			var recipientFriendship = await _context.Friends
+				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == recipient!.Id && f.AddedToFriendsUserId == sender!.Id);
+
+			if (senderFriendship == null || recipientFriendship == null)
+			{
+				throw new HubException("You are not friends with this user");
+			}
 
 			if (recipient == null)
 			{
@@ -97,6 +115,8 @@ namespace API.SignalR
 			if (await _messageRepository.SaveAllAsync())
 			{
 				await Clients.Group(groupName).SendAsync("NewMessage", _mapper.Map<MessageDto>(message));
+
+				SendUpdateConversations(recipient.UserName);
 			}
 		}
 
@@ -139,6 +159,18 @@ namespace API.SignalR
 		{
 			var stringCompare = string.CompareOrdinal(caller, other) < 0;
 			return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
+		}
+
+		private async void SendUpdateConversations(string otherUsername)
+		{
+			var connections = await _tracker.GetConnectionsForUser(otherUsername);
+			
+			if (connections == null)
+			{
+				return;
+			}
+			
+			await _presenceHub.Clients.Clients(connections).SendAsync("UpdateConversations", new {});
 		}
 	}
 }

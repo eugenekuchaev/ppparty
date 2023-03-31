@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class MessageRepository : IMessageRepository
+	public class MessageRepository : IMessageRepository
 	{
 		private readonly DataContext _context;
 		private readonly IMapper _mapper;
@@ -66,35 +66,35 @@ namespace API.Data
 			return PagedList<MessageDto>.Create(mappedMessages, userParams.PageNumber, userParams.PageSize);
 		}
 
-        public async Task<IEnumerable<MessageDto>> GetMessageThreadWithoutParams(string currentUsername, 
-            string recipientUsername)
-        {
-            var messages = await _context.Messages
-                .Include(u => u.Sender).ThenInclude(p => p.UserPhoto)
-                .Include(u => u.Recipient).ThenInclude(p => p.UserPhoto)
-                .Where(m => m.Recipient.UserName == currentUsername && m.RecipientDeleted == false
-                        && m.Sender.UserName == recipientUsername
-                        || m.Recipient.UserName == recipientUsername
-                        && m.Sender.UserName == currentUsername && m.SenderDeleted == false
-                )
-                .OrderByDescending(m => m.MessageSent)
-                .ToListAsync();
+		public async Task<IEnumerable<MessageDto>> GetMessageThreadWithoutParams(string currentUsername, 
+			string recipientUsername)
+		{
+			var messages = await _context.Messages
+				.Include(u => u.Sender).ThenInclude(p => p.UserPhoto)
+				.Include(u => u.Recipient).ThenInclude(p => p.UserPhoto)
+				.Where(m => m.Recipient.UserName == currentUsername && m.RecipientDeleted == false
+						&& m.Sender.UserName == recipientUsername
+						|| m.Recipient.UserName == recipientUsername
+						&& m.Sender.UserName == currentUsername && m.SenderDeleted == false
+				)
+				.OrderByDescending(m => m.MessageSent)
+				.ToListAsync();
 
-            var unreadMessages = messages.Where(m => m.DateRead == null 
-                && m.Recipient.UserName == currentUsername).ToList();
+			var unreadMessages = messages.Where(m => m.DateRead == null 
+				&& m.Recipient.UserName == currentUsername).ToList();
 
-            if (unreadMessages.Any())
-            {
-                foreach (var message in unreadMessages)
-                {
-                    message.DateRead = DateTime.UtcNow;
-                }
+			if (unreadMessages.Any())
+			{
+				foreach (var message in unreadMessages)
+				{
+					message.DateRead = DateTime.UtcNow;
+				}
 
-                await _context.SaveChangesAsync();
-            }
+				await _context.SaveChangesAsync();
+			}
 
-            return _mapper.Map<IEnumerable<MessageDto>>(messages);
-        }
+			return _mapper.Map<IEnumerable<MessageDto>>(messages);
+		}
 
 		public async Task<bool> SaveAllAsync()
 		{
