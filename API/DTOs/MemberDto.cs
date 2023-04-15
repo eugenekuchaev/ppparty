@@ -35,7 +35,7 @@ namespace API.DTOs
 		public DateTime LastActive { get; set; } 
 
 		// Navigation properties
-		public UserPhotoDto? UserPhoto { get; set; }
+		public UserPhoto? UserPhoto { get; set; }
 		public ICollection<UserInterest>? UserInterests { get; set; } 
 	}
 }

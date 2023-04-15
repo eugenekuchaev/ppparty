@@ -11,6 +11,7 @@ namespace API.Helpers
 			CreateMap<AppUser, MemberDto>()
 				.ForMember(dest => dest.UserPhotoUrl, 
 					opt => opt.MapFrom(src => src.UserPhoto.PhotoUrl));
+					
 			CreateMap<UserPhoto, UserPhotoDto>();
 			CreateMap<UserInterest, UserInterestDto>();
 			CreateMap<NameUpdateDto, AppUser>();
@@ -18,11 +19,27 @@ namespace API.Helpers
 			CreateMap<AboutUpdateDto, AppUser>();
 			CreateMap<ContactsUpdateDto, AppUser>();
 			CreateMap<RegisterDto, AppUser>();
+			
 			CreateMap<Message, MessageDto>()
 				.ForMember(dest => dest.SenderPhotoUrl, 
 					opt => opt.MapFrom(src => src.Sender.UserPhoto.PhotoUrl))
 				.ForMember(dest => dest.RecipientPhotoUrl,
 					opt => opt.MapFrom(src => src.Recipient.UserPhoto.PhotoUrl));
+					
+			CreateMap<Event, EventDto>()
+				.ForMember(dest => dest.EventPhotoUrl,
+					opt => opt.MapFrom(src => src.EventPhoto.PhotoUrl))
+				.ForMember(dest => dest.EventOwnerUsername,
+					opt => opt.MapFrom(src => src.EventOwner.UserName));
+					
+			CreateMap<Event, FullEventDto>();
+			CreateMap<EventUpdateDto, Event>();
+			CreateMap<EventDto, Event>();
+			CreateMap<EventPhoto, EventPhotoDto>();
+			
+			CreateMap<AppUser, MemberInEventDto>()
+				.ForMember(dest => dest.UserPhotoUrl,
+					opt => opt.MapFrom(src => src.UserPhoto.PhotoUrl));
 		}
 	}
 }

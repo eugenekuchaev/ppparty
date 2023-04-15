@@ -202,6 +202,118 @@ namespace API.Data.Migrations
                     b.ToTable("Connections");
                 });
 
+            modelBuilder.Entity("API.Entities.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventOwnerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsEnded")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventOwnerId");
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("API.Entities.EventDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventDate");
+                });
+
+            modelBuilder.Entity("API.Entities.EventPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PhotoUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PublicId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique();
+
+                    b.ToTable("EventPhotos");
+                });
+
+            modelBuilder.Entity("API.Entities.EventTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EventTagName")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventTags");
+                });
+
             modelBuilder.Entity("API.Entities.Group", b =>
                 {
                     b.Property<string>("GroupName")
@@ -297,6 +409,36 @@ namespace API.Data.Migrations
                     b.ToTable("UserPhotos");
                 });
 
+            modelBuilder.Entity("AppUserEvent", b =>
+                {
+                    b.Property<int>("ParticipantsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ParticipateInEventsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ParticipantsId", "ParticipateInEventsId");
+
+                    b.HasIndex("ParticipateInEventsId");
+
+                    b.ToTable("AppUserEvent");
+                });
+
+            modelBuilder.Entity("AppUserEvent1", b =>
+                {
+                    b.Property<int>("InvitedToEventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("InvitedToEventsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("InvitedToEventId", "InvitedToEventsId");
+
+                    b.HasIndex("InvitedToEventsId");
+
+                    b.ToTable("AppUserEvent1");
+                });
+
             modelBuilder.Entity("AppUserUserInterest", b =>
                 {
                     b.Property<int>("AppUsersId")
@@ -310,6 +452,21 @@ namespace API.Data.Migrations
                     b.HasIndex("UserInterestsId");
 
                     b.ToTable("AppUserUserInterest");
+                });
+
+            modelBuilder.Entity("EventEventTag", b =>
+                {
+                    b.Property<int>("EventTagsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EventsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("EventTagsId", "EventsId");
+
+                    b.HasIndex("EventsId");
+
+                    b.ToTable("EventEventTag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -441,6 +598,39 @@ namespace API.Data.Migrations
                         .HasForeignKey("GroupName");
                 });
 
+            modelBuilder.Entity("API.Entities.Event", b =>
+                {
+                    b.HasOne("API.Entities.AppUser", "EventOwner")
+                        .WithMany("OwnedEvents")
+                        .HasForeignKey("EventOwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventOwner");
+                });
+
+            modelBuilder.Entity("API.Entities.EventDate", b =>
+                {
+                    b.HasOne("API.Entities.Event", "Event")
+                        .WithMany("EventDates")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("API.Entities.EventPhoto", b =>
+                {
+                    b.HasOne("API.Entities.Event", "Event")
+                        .WithOne("EventPhoto")
+                        .HasForeignKey("API.Entities.EventPhoto", "EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
             modelBuilder.Entity("API.Entities.Message", b =>
                 {
                     b.HasOne("API.Entities.AppUser", "Recipient")
@@ -471,6 +661,36 @@ namespace API.Data.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("AppUserEvent", b =>
+                {
+                    b.HasOne("API.Entities.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipateInEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AppUserEvent1", b =>
+                {
+                    b.HasOne("API.Entities.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("InvitedToEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("InvitedToEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("AppUserUserInterest", b =>
                 {
                     b.HasOne("API.Entities.AppUser", null)
@@ -482,6 +702,21 @@ namespace API.Data.Migrations
                     b.HasOne("API.Entities.UserInterest", null)
                         .WithMany()
                         .HasForeignKey("UserInterestsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EventEventTag", b =>
+                {
+                    b.HasOne("API.Entities.EventTag", null)
+                        .WithMany()
+                        .HasForeignKey("EventTagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -537,10 +772,20 @@ namespace API.Data.Migrations
 
                     b.Navigation("MessagesSent");
 
+                    b.Navigation("OwnedEvents");
+
                     b.Navigation("UserPhoto")
                         .IsRequired();
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("API.Entities.Event", b =>
+                {
+                    b.Navigation("EventDates");
+
+                    b.Navigation("EventPhoto")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("API.Entities.Group", b =>

@@ -27,10 +27,12 @@ namespace API.Extensions
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<IFriendsRepository, FriendsRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
+			services.AddScoped<IEventRepository, EventRepository>();
 			
 			services.AddSingleton<PresenceTracker>();
 			
 			services.AddScoped<LinkTransformer>();
+			services.AddScoped<InputProcessor>();
 			
 			return services;
 		}

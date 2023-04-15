@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
@@ -19,10 +18,12 @@ namespace API.Controllers
 		private readonly IMapper _mapper;
 		private readonly IPhotoService _photoService;
 		private readonly LinkTransformer _linkTransformer;
+		private readonly InputProcessor _inputProcessor;
 
-		public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService, 
-			LinkTransformer linkTransformer)
+		public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService,
+			LinkTransformer linkTransformer, InputProcessor inputProcessor)
 		{
+			_inputProcessor = inputProcessor;
 			_linkTransformer = linkTransformer;
 			_photoService = photoService;
 			_mapper = mapper;
@@ -30,13 +31,13 @@ namespace API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userParams)
+		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			userParams.CurrentUsername = user!.UserName;
-			
+
 			var users = await _userRepository.GetMembersAsync(userParams);
-			
+
 			Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
 
 			return Ok(users);
@@ -52,7 +53,7 @@ namespace API.Controllers
 		public async Task<ActionResult> UpdateName(NameUpdateDto nameUpdateDto)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			
+
 			var trimmedNameUpdateDto = new NameUpdateDto
 			{
 				FullName = nameUpdateDto.FullName.Trim()
@@ -74,13 +75,13 @@ namespace API.Controllers
 		public async Task<ActionResult> UpdateLocation(LocationUpdateDto locationUpdateDto)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			
+
 			if (locationUpdateDto.City == "" || locationUpdateDto.City == null)
 			{
 				locationUpdateDto.City = "Somewhere";
 			}
-			
-			var trimmedLocationUpdateDto = new LocationUpdateDto 
+
+			var trimmedLocationUpdateDto = new LocationUpdateDto
 			{
 				City = locationUpdateDto.City.Trim(),
 				Region = locationUpdateDto.Region?.Trim(),
@@ -98,21 +99,21 @@ namespace API.Controllers
 
 			return BadRequest("Failed to update user");
 		}
-		
+
 		[HttpPut("updateAbout")]
 		public async Task<ActionResult> UpdateAbout(AboutUpdateDto aboutUpdateDto)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			
-			var trimmedAboutUpdateDto = new AboutUpdateDto 
+
+			var trimmedAboutUpdateDto = new AboutUpdateDto
 			{
 				About = aboutUpdateDto?.About?.Trim()
 			};
-			
+
 			_mapper.Map(trimmedAboutUpdateDto, user);
 
 			_userRepository.UpdateUser(user!);
-			
+
 			if (await _userRepository.SaveAllAsync())
 			{
 				return NoContent();
@@ -122,43 +123,38 @@ namespace API.Controllers
 		}
 
 		[HttpPost("addinterests")]
-		public async Task<ActionResult> AddInterests([FromBody]string interests)
+		public async Task<ActionResult> AddInterests([FromBody] string interests)
 		{
-			string pattern = @"^[ ,]*$";
-
-			bool containsOnlySpacesOrCommas = Regex.IsMatch(interests, pattern);
-
-			if (interests == null || interests == "" || containsOnlySpacesOrCommas)
+			if (!_inputProcessor.ValidateInput(interests))
 			{
 				return BadRequest("You need to add interests");
 			}
 
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
-			List<string> userInterests = interests
-				.Split(',', StringSplitOptions.RemoveEmptyEntries)
-				.Select(s => s.Trim())
-				.ToList();
-
+			var userInterests = _inputProcessor.SplitString(interests);
+				
 			foreach (var userInterest in userInterests)
 			{
-				if (userInterest != "") 
+				if (userInterest.Length > 32)
 				{
-					if (userInterest.Length > 32)
-					{
-						return BadRequest("One of the interests is too long");
-					}
-					
-					var userInterestFromDb = await _userRepository.GetUserInterestByNameAsync(userInterest);
-					
-					if (userInterestFromDb != null)
-					{
-						user!.UserInterests?.Add(userInterestFromDb);
-					}
-					else 
-					{
-						user!.UserInterests?.Add(new UserInterest { InterestName = userInterest });
-					}
+					return BadRequest("One of the interests is too long");
+				}
+				
+				if (user!.UserInterests!.Any(x => x.InterestName == userInterest))
+				{
+					return BadRequest("You already have one of these interests");
+				}
+				
+				var userInterestFromDb = await _userRepository.GetUserInterestByNameAsync(userInterest);
+				
+				if (userInterestFromDb != null)
+				{
+					user!.UserInterests?.Add(userInterestFromDb);
+				}
+				else
+				{
+					user!.UserInterests?.Add(new UserInterest { InterestName = userInterest });
 				}
 			}
 
@@ -198,7 +194,7 @@ namespace API.Controllers
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			_mapper.Map(contactsUpdateDto, user);
-			
+
 			user!.FacebookLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.FacebookLink);
 			user.InstagramLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.InstagramLink);
 			user.TwitterLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.TwitterLink);
@@ -214,33 +210,33 @@ namespace API.Controllers
 
 			return BadRequest("Failed to update user");
 		}
-		
+
 		[HttpPost("add-photo")]
 		public async Task<ActionResult<UserPhotoDto>> AddPhoto(IFormFile file)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			
-			var result = await _photoService.AddPhotoAsync(file);
-			
+
+			var result = await _photoService.AddPhotoAsync(file, "user");
+
 			if (result.Error != null)
 			{
 				return BadRequest(result.Error.Message);
 			}
-			
+
 			var photo = new UserPhoto
 			{
 				PhotoUrl = result.SecureUrl.AbsoluteUri,
 				PublicId = result.PublicId,
 				AppUser = user!
 			};
-			
+
 			_userRepository.AddPhoto(photo);
-			
+
 			if (await _userRepository.SaveAllAsync())
 			{
 				return CreatedAtRoute("GetUser", new { Username = user!.UserName }, _mapper.Map<UserPhotoDto>(photo));
 			}
-			
+
 			return BadRequest("Problem adding photo");
 		}
 	}

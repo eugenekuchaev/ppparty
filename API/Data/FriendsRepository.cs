@@ -1,6 +1,5 @@
 using API.DTOs;
 using API.Entities;
-using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,6 +67,22 @@ namespace API.Data
 			return await _context.Users
 				.Include(x => x.AddedToFriendsUsers)
 				.FirstOrDefaultAsync(x => x.Id == userId);
+		}
+		
+		public async Task<bool> CheckIfUsersAreFriends(int firstUserId, int secondUserId)
+		{
+			var firstUserFriendship = await _context.Friends
+				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == firstUserId && f.AddedToFriendsUserId == secondUserId);
+
+			var secondUserFrienship = await _context.Friends
+				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == secondUserId && f.AddedToFriendsUserId == firstUserId);
+
+			if (firstUserFriendship == null || secondUserFrienship == null)
+			{
+				return false;
+			}
+			
+			return true;
 		}
 	}
 }

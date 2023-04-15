@@ -17,10 +17,12 @@ namespace API.SignalR
 		private readonly IHubContext<PresenceHub> _presenceHub;
 		private readonly PresenceTracker _tracker;
 		private readonly DataContext _context;
+		private readonly IFriendsRepository _friendsRepository;
 
 		public MessageHub(IMessageRepository messageRepository, IMapper mapper, IUserRepository userRepository,
-			IHubContext<PresenceHub> presenceHub, PresenceTracker tracker, DataContext context)
+			IHubContext<PresenceHub> presenceHub, PresenceTracker tracker, DataContext context, IFriendsRepository friendsRepository)
 		{
+			_friendsRepository = friendsRepository;
 			_context = context;
 			_tracker = tracker;
 			_presenceHub = presenceHub;
@@ -55,6 +57,10 @@ namespace API.SignalR
 
 		public async Task SendMessage(CreateMessageDto createMessageDto)
 		{
+			if (createMessageDto.Content.Length > 1000)
+			{
+				throw new HubException("The message is too long");
+			}
 
 			var username = Context.User!.GetUsername();
 
@@ -65,21 +71,15 @@ namespace API.SignalR
 
 			var sender = await _userRepository.GetUserByUsernameAsync(username);
 			var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername!);
-
-			var senderFriendship = await _context.Friends
-				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == sender!.Id && f.AddedToFriendsUserId == recipient!.Id);
-
-			var recipientFriendship = await _context.Friends
-				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == recipient!.Id && f.AddedToFriendsUserId == sender!.Id);
-
-			if (senderFriendship == null || recipientFriendship == null)
-			{
-				throw new HubException("You are not friends with this user");
-			}
-
+			
 			if (recipient == null)
 			{
 				throw new HubException("Not found user");
+			}
+
+			if (!await _friendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
+			{
+				throw new HubException("You are not friends with this user");
 			}
 
 			var message = new Message

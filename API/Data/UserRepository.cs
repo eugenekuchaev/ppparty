@@ -4,6 +4,7 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
@@ -12,9 +13,11 @@ namespace API.Data
 	{
 		private readonly DataContext _context;
 		private readonly IMapper _mapper;
+		private readonly UserManager<AppUser> _userManager;
 
-		public UserRepository(DataContext context, IMapper mapper)
+		public UserRepository(DataContext context, IMapper mapper, UserManager<AppUser> userManager)
 		{
+			_userManager = userManager;	
 			_mapper = mapper;
 			_context = context;
 		}
@@ -61,7 +64,8 @@ namespace API.Data
 				query = query.Where(u => u.UserInterests!.Any(i => 
 					i.InterestName.ToLower() == userParams.UserInterest.ToLower()));
 			}
-			
+				
+			query = query.Where(x => !x.UserRoles.Any(r => r.RoleId == 2));
 			query = query.Where(u => u.UserName != userParams.CurrentUsername);
 
 			return await PagedList<MemberDto>.CreateAsync(
@@ -70,31 +74,11 @@ namespace API.Data
 				userParams.PageSize);
 		}
 
-		public async Task<AppUser?> GetUserByIdAsync(int id)
-		{
-			return await _context.Users
-				.FindAsync(id);
-		}
-
 		public async Task<AppUser?> GetUserByUsernameAsync(string username)
 		{
 			return await _context.Users
-				.Include(p => p.UserPhoto)
-				.Include(p => p.UserInterests)
+				.Include(u => u.UserPhoto)
 				.SingleOrDefaultAsync(x => x.UserName == username);
-		}
-
-		public async Task<IEnumerable<AppUser>> GetUsersAsync()
-		{
-			return await _context.Users
-				.Include(p => p.UserPhoto)
-				.Include(p => p.UserInterests)
-				.ToListAsync();
-		}
-
-		public async Task<IEnumerable<UserInterest>> GetUserInterestsAsync()
-		{
-			return await _context.UserInterests.ToListAsync();
 		}
 
 		public async Task<UserInterest?> GetUserInterestByNameAsync(string interestName)

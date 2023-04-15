@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities
@@ -31,11 +32,14 @@ namespace API.Entities
 
 		// Navigation properties
 		public UserPhoto UserPhoto { get; set; } = null!;
-		public ICollection<UserInterest>? UserInterests { get; set; }
+		public List<UserInterest>? UserInterests { get; set; }
 		public ICollection<AppUserFriend>? AddedToFriendsByUsers { get; set; }
 		public ICollection<AppUserFriend>? AddedToFriendsUsers { get; set; }
 		public ICollection<Message>? MessagesSent { get; set; }
 		public ICollection<Message>? MessagesRecieved { get; set; }
 		public ICollection<AppUserRole> UserRoles { get; set; } = null!;
+		public ICollection<Event>? OwnedEvents { get; set; }
+		public ICollection<Event>? ParticipateInEvents { get; set; }
+		public ICollection<Event>? InvitedToEvents { get; set; }
 	}
 }

@@ -107,7 +107,7 @@ export class MessageService {
     return this.hubConnection.invoke("SendMessage", {recipientUsername: username, content})
       .catch(error => {
         console.log(error);
-        this.toastr.error("You can send messages only to friends");
+        this.toastr.error("The message is too long or you are not friends with this user");
       });
   }
 }

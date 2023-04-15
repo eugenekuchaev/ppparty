@@ -9,44 +9,59 @@ namespace API.Services
 	public class PhotoService : IPhotoService
 	{
 		private readonly Cloudinary _cloudinary;
-		
+
 		public PhotoService(IOptions<CloudinarySettings> configuration)
 		{
 			var acc = new Account
 			(
 				configuration.Value.CloudName,
 				configuration.Value.ApiKey,
-				configuration.Value.ApiSecret 	
+				configuration.Value.ApiSecret
 			);
-			
+
 			_cloudinary = new Cloudinary(acc);
 		}
 
-		public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+		public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file, string param)
 		{
 			var uploadResult = new ImageUploadResult();
-			
+
 			if (file.Length > 0)
 			{
 				using var stream = file.OpenReadStream();
-				var uploadParams = new ImageUploadParams
+
+				if (param == "user")
 				{
-					File = new FileDescription(file.FileName, stream),
-					Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face")
-				};
-				
-				uploadResult = await _cloudinary.UploadAsync(uploadParams);
+					var uploadParams = new ImageUploadParams
+					{
+						File = new FileDescription(file.FileName, stream),
+						Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face")
+					};
+					
+					uploadResult = await _cloudinary.UploadAsync(uploadParams);
+				}
+
+				if (param == "event")
+				{
+					var uploadParams = new ImageUploadParams
+					{
+						File = new FileDescription(file.FileName, stream),
+						Transformation = new Transformation().Height(1080).Width(1920).Crop("fill")
+					};
+					
+					uploadResult = await _cloudinary.UploadAsync(uploadParams);
+				}
 			}
-			
+
 			return uploadResult;
 		}
 
 		public async Task<DeletionResult> DeletePhotoAsync(string publicId)
 		{
 			var deleteParams = new DeletionParams(publicId);
-			
+
 			var result = await _cloudinary.DestroyAsync(deleteParams);
-			
+
 			return result;
 		}
 	}
