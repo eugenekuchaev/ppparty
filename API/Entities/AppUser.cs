@@ -1,9 +1,8 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities
 {
-	public class AppUser : IdentityUser<int>
+    public class AppUser : IdentityUser<int>
 	{
 		// Registration properties
 		public string FullName { get; set; } = null!;
