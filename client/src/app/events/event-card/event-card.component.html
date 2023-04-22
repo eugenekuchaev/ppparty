@@ -1,0 +1,108 @@
+<div class="card mb-3" *ngIf="appEvent">
+    <div class="row">
+        <div class="col">
+            <div class="d-flex align-items-center h-100 justify-content-center pl-3">
+                <div>
+                    <img src="{{appEvent.eventPhotoUrl}}" alt="{{appEvent.eventName}}" class="img-fluid">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card-body p-4"> 
+                <h5 class="card-title mb-1 mt-1">{{appEvent.eventName}}</h5>
+                <p>{{shortenedEventDescription}}</p>
+                <div class="d-flex mb-2">
+                    <h6 class="event-info text-muted"><i class="fa fa-map-marker fa-lg"></i> {{appEvent.city}}</h6>
+                    <h6 class="event-info text-muted"><i class="fa fa-clock-o fa-lg"></i> {{formatEarliestDate(appEvent)}}</h6>
+                    <h6 class="event-info text-muted" *ngIf="appEvent.price === 0">
+                        <i class="fa fa-money fa-lg"></i> Free
+                    </h6>
+                    <h6 class="event-info text-muted" *ngIf="appEvent.price > 0">
+                        <i class="fa fa-money fa-lg"></i> {{appEvent.price}} {{appEvent.currency}}
+                    </h6>
+                </div>
+                <ng-container *ngFor="let eventTag of appEvent.eventTags">
+                    <span class="badge bg-primary">
+                        {{eventTag.eventTagName}}
+                    </span>
+                </ng-container>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showParticipateButtonInRecommended">
+                        <button 
+                            class="btn btn-success" 
+                            type="button" 
+                            (click)="participateInEvent(appEvent)">
+                                Participate
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInAll && !checkIfEventIsInParticipated(appEvent)">
+                        <button 
+                            class="btn btn-success" 
+                            type="button" 
+                            (click)="participateInEvent(appEvent)">
+                                Participate
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInAll && checkIfEventIsInParticipated(appEvent)">
+                        <button 
+                            class="btn btn-danger" 
+                            type="button" 
+                            (click)="stopParticipatingInEvent(appEvent)">
+                                Cancel
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showFriendsEventsButtons && !checkIfEventIsInParticipated(appEvent)">
+                        <button 
+                            class="btn btn-success" 
+                            type="button" 
+                            (click)="participateInEvent(appEvent)">
+                                Participate
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showFriendsEventsButtons && checkIfEventIsInParticipated(appEvent)">
+                        <button 
+                            class="btn btn-danger" 
+                            type="button" 
+                            (click)="stopParticipatingInEvent(appEvent)">
+                                Cancel
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showInviteButtons">
+                        <button 
+                            class="btn btn-success accept-invite-button" 
+                            type="button" 
+                            (click)="participateInEvent(appEvent)">
+                                Accept
+                        </button>
+                        <button 
+                            class="btn btn-danger" 
+                            type="button" 
+                            (click)="declineInvitation(appEvent)">
+                                Decline
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showCancelButtonInParticipated && checkIfEventIsInParticipated(appEvent)">
+                        <button 
+                            class="btn btn-danger" 
+                            type="button" 
+                            (click)="stopParticipatingInEvent(appEvent)">
+                                Cancel
+                        </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+.card:hover {
+    cursor: pointer;
+}
+
+.card-img-wrapper {
+    overflow: hidden;
+    position: relative;
+}
+
+img {
+    margin-left: 25px;
+}
+
+.badge {
+    margin-right: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.event-info {
+    margin-right: 80px;
+}
+
+.accept-invite-button {
+    margin-right: 10px;
+}

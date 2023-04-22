@@ -1,1 +1,275 @@
-<p>event-list works!</p>
+<div class="row mb-5">
+    <div class="col-2">
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item mb-1">
+                <div *ngIf="recommendedEventsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnRecommendedEvents()">Recommended</a>
+                </div>
+                <div *ngIf="recommendedEventsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnRecommendedEvents()">Recommended</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="allEventsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnAllEvents()">All</a>
+                </div>
+                <div *ngIf="allEventsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnAllEvents()">All</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="participatedEventsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnParticipatedEvents()">Participated</a>
+                </div>
+                <div *ngIf="participatedEventsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnParticipatedEvents()">Participated</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="ownedEventsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnOwnedEvents()">Owned</a>
+                </div>
+                <div *ngIf="ownedEventsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnOwnedEvents()">Owned</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="friendsEventsIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnFriendsEvents()">Friends</a>
+                </div>
+                <div *ngIf="friendsEventsIsActivated == false">
+                    <a class="nav-link" (click)="clickOnFriendsEvents()">Friends</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="eventInvitesIsActivated == true">
+                    <a class="nav-link active" (click)="clickOnEventInvites()">Invites</a>
+                </div>
+                <div *ngIf="eventInvitesIsActivated == false">
+                    <a class="nav-link" (click)="clickOnEventInvites()">Invites</a>
+                </div>
+            </li>
+            <li class="nav-item mt-3" *ngIf="allEventsIsActivated">
+                <div>
+                    <a class="nav-link dropdown-toggle" (click)="clickOnSearch()">Search</a>
+                </div>
+            </li>
+            </ul>
+
+        <div *ngIf="searchOpen == true && allEventsIsActivated">
+            <form #form="ngForm" class="row-1 mt-2" (ngSubmit)="loadAllEvents()" autocomplete="off">
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="eventName" [(ngModel)]="eventParams.eventName"
+                        placeholder="Event name">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="fromDate" [(ngModel)]="eventParams.fromDate"
+                        (ngModelChange)="eventParams.fromDate = eventParams.fromDate.toString()" placeholder="From date"
+                        type="date">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="toDate" [(ngModel)]="eventParams.toDate"
+                    (ngModelChange)="eventParams.toDate = eventParams.toDate.toString()" placeholder="To date"
+                    type="date">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="country" [(ngModel)]="eventParams.country"
+                        placeholder="Country">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="region" [(ngModel)]="eventParams.region"
+                        placeholder="Region">
+                </div>
+                <div class="col mb-2">
+                    <input type="text" class="form-control ml-1" name="city" [(ngModel)]="eventParams.city"
+                        placeholder="City">
+                </div>
+                <div class="col mb-3">
+                    <input type="text" class="form-control ml-1" name="eventTag"
+                        [(ngModel)]="eventParams.eventTag" placeholder="Tag">
+                </div>
+                <div class="col-auto d-grid gap-2">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button (click)="resetFilters()" class="btn btn-secondary" type="submit">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col">
+        <div *ngIf="recommendedEventsIsActivated == true">
+            <div class="row">
+                <div *ngIf="recommendedEvents.length === 0">
+                    <h5 class="text-center">
+                        You don't have any recommended events. Try to <a routerLink="/member/edit">add more interests</a>.
+                    </h5>
+                </div>
+                <div *ngFor="let appEvent of recommendedEvents">
+                    <app-event-card 
+                        [appEvent]="appEvent" 
+                        [recommendedEvents]="recommendedEvents"
+                        [allEvents]="allEvents"
+                        [participatedEvents]="participatedEvents"
+                        [ownedEvents]="ownedEvents"
+                        [friendsEvents]="friendsEvents"
+                        [invites]="invites"
+                        [showParticipateButtonInRecommended]="true">
+                    </app-event-card>
+                </div>
+            </div>
+        </div>
+        
+        <div *ngIf="allEventsIsActivated == true">
+            <div class="row">
+                <div *ngFor="let appEvent of allEvents">
+                    <app-event-card 
+                        [appEvent]="appEvent" 
+                        [recommendedEvents]="recommendedEvents"
+                        [allEvents]="allEvents"
+                        [participatedEvents]="participatedEvents"
+                        [ownedEvents]="ownedEvents"
+                        [friendsEvents]="friendsEvents"
+                        [invites]="invites"
+                        [showButtonsInAll]="true">
+                    </app-event-card>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center" *ngIf="pagination">
+                <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems"
+                    [itemsPerPage]="pagination.itemsPerPage" [(ngModel)]="pagination.currentPage"
+                    (pageChanged)="pageChanged($event)" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;"
+                    lastText="&raquo;">
+                </pagination>
+            </div>
+        </div>
+
+        <div *ngIf="participatedEventsIsActivated == true">
+            <div class="row">
+                <div *ngIf="participatedEvents.length === 0">
+                    <h5 class="text-center">You're not planning to participate in any events.</h5>
+                </div>
+                <div *ngFor="let appEvent of participatedEvents">
+                    <ng-container *ngIf="!appEvent.isEnded">
+                        <app-event-card 
+                            [appEvent]="appEvent" 
+                            [recommendedEvents]="recommendedEvents"
+                            [allEvents]="allEvents"
+                            [participatedEvents]="participatedEvents"
+                            [ownedEvents]="ownedEvents"
+                            [friendsEvents]="friendsEvents"
+                            [invites]="invites"
+                            [showCancelButtonInParticipated]="true">
+                        </app-event-card>
+                    </ng-container>
+                </div>
+                <div class="text-center">
+                    <button 
+                        class="btn btn-primary btn-sm mb-3 col-2" 
+                        type="button" 
+                        (click)="showEndedParticipatedEvents = !showEndedParticipatedEvents" 
+                        *ngIf="checkIfParticipatedHasEndedEvents()">
+                        Show ended events
+                    </button>
+                </div>
+                
+                <div *ngFor="let appEvent of participatedEvents">
+                    <ng-container *ngIf="appEvent.isEnded && showEndedParticipatedEvents">
+                        <app-event-card 
+                            [appEvent]="appEvent" 
+                            [recommendedEvents]="recommendedEvents"
+                            [allEvents]="allEvents"
+                            [participatedEvents]="participatedEvents"
+                            [ownedEvents]="ownedEvents"
+                            [friendsEvents]="friendsEvents"
+                            [invites]="invites">
+                        </app-event-card>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="ownedEventsIsActivated == true">
+            <div class="row">
+                <div *ngIf="ownedEvents.length === 0">
+                    <h5 class="text-center">You don't have any owned events.</h5>
+                </div>
+                <div *ngFor="let appEvent of ownedEvents">
+                    <ng-container *ngIf="!appEvent.isEnded">
+                        <app-event-card 
+                            [appEvent]="appEvent" 
+                            [recommendedEvents]="recommendedEvents"
+                            [allEvents]="allEvents"
+                            [participatedEvents]="participatedEvents"
+                            [ownedEvents]="ownedEvents"
+                            [friendsEvents]="friendsEvents"
+                            [invites]="invites">
+                        </app-event-card>
+                    </ng-container>
+                </div>
+                <div class="text-center">
+                    <button 
+                    class="btn btn-primary btn-sm mb-3 col-2" 
+                    type="button" 
+                    (click)="showEndedOwnedEvents = !showEndedOwnedEvents"
+                    *ngIf="checkIfOwnedHasEndedEvents()">
+                    Show ended events
+                    </button>
+                </div>
+                <div *ngFor="let appEvent of ownedEvents">
+                    <ng-container *ngIf="appEvent.isEnded && showEndedOwnedEvents">
+                        <app-event-card 
+                            [appEvent]="appEvent" 
+                            [recommendedEvents]="recommendedEvents"
+                            [allEvents]="allEvents"
+                            [participatedEvents]="participatedEvents"
+                            [ownedEvents]="ownedEvents"
+                            [friendsEvents]="friendsEvents"
+                            [invites]="invites">
+                        </app-event-card>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="friendsEventsIsActivated == true">
+            <div class="row">
+                <div *ngIf="friendsEvents.length === 0">
+                    <h5 class="text-center">Your friends don't participate in any events.</h5>
+                </div>
+                <div *ngFor="let appEvent of friendsEvents">
+                    <app-event-card 
+                        [appEvent]="appEvent" 
+                        [recommendedEvents]="recommendedEvents"
+                        [allEvents]="allEvents"
+                        [participatedEvents]="participatedEvents"
+                        [ownedEvents]="ownedEvents"
+                        [friendsEvents]="friendsEvents"
+                        [invites]="invites"
+                        [showFriendsEventsButtons]="true">
+                    </app-event-card>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="eventInvitesIsActivated == true">
+            <div class="row">
+                <div *ngIf="invites.length === 0">
+                    <h5 class="text-center">You don't have any invites.</h5>
+                </div>
+                <div *ngFor="let appEvent of invites">
+                    <app-event-card 
+                        [appEvent]="appEvent" 
+                        [recommendedEvents]="recommendedEvents"
+                        [allEvents]="allEvents"
+                        [participatedEvents]="participatedEvents"
+                        [ownedEvents]="ownedEvents"
+                        [friendsEvents]="friendsEvents"
+                        [invites]="invites"
+                        [showInviteButtons]="true">
+                    </app-event-card>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

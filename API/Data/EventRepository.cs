@@ -42,7 +42,7 @@ namespace API.Data
 				appEvent.Participants.Add(user);
 			}
 		}
-		
+
 		public async Task RemoveUserFromEventParticipantsAsync(int eventId, string username)
 		{
 			var appEvent = await _context.Events
@@ -56,7 +56,7 @@ namespace API.Data
 				appEvent.Participants.Remove(user);
 			}
 		}
-		
+
 		public async Task AddUserToInvitedToEventAsync(int eventId, string username)
 		{
 			var appEvent = await _context.Events
@@ -70,7 +70,7 @@ namespace API.Data
 				appEvent.InvitedToEvent!.Add(user);
 			}
 		}
-		
+
 		public async Task RemoveUserFromEventInvitationsAsync(int eventId, string username)
 		{
 			var appEvent = await _context.Events
@@ -97,7 +97,7 @@ namespace API.Data
 
 		public async Task<PagedList<EventDto>> GetAllEventsAsync(EventParams eventParams)
 		{
-			var query = _context.Events.AsQueryable();
+			var query = _context.Events.Include(x => x.EventDates).AsQueryable();
 
 			if (!string.IsNullOrEmpty(eventParams.EventName))
 			{
@@ -107,7 +107,7 @@ namespace API.Data
 			if (eventParams.FromDate != null && eventParams.ToDate != null)
 			{
 				var fromDate = DateTime.Parse(eventParams.FromDate);
-				var toDate = DateTime.Parse(eventParams.ToDate);
+				var toDate = DateTime.Parse(eventParams.ToDate).AddDays(1);
 
 				query = query.Where(e => e.EventDates
 					.Any(d => d.StartDate <= toDate
@@ -134,6 +134,10 @@ namespace API.Data
 				query = query.Where(u => u.EventTags!.Any(i =>
 					i.EventTagName.ToLower() == eventParams.EventTag.ToLower()));
 			}
+			
+			query = query
+				.Where(x => x.EventDates.Any(y => y.EndDate > DateTime.UtcNow))
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate));
 
 			return await PagedList<EventDto>.CreateAsync(
 				query.ProjectTo<EventDto>(_mapper.ConfigurationProvider).AsNoTracking(),
@@ -172,13 +176,14 @@ namespace API.Data
 
 			return eventDto;
 		}
-		
+
 		public async Task<Event?> GetEventEntityAsync(int eventId)
 		{
 			return await _context.Events
 				.Where(x => x.Id == eventId)
 				.Include(x => x.EventTags)
 				.Include(x => x.EventPhoto)
+				.Include(x => x.Participants)
 				.SingleOrDefaultAsync();
 		}
 
@@ -191,6 +196,7 @@ namespace API.Data
 		{
 			var events = await _context.Events
 				.Where(x => x.EventOwner.UserName == username)
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
 
@@ -206,6 +212,7 @@ namespace API.Data
 		{
 			var events = await _context.Events
 				.Where(x => x.Participants.Any(x => x.UserName == username))
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
 
@@ -227,6 +234,8 @@ namespace API.Data
 
 			return await _context.Events
 				.Where(e => e.Participants.Any(x => friendIds.Contains(x.Id)))
+				.Where(x => x.EventDates.Any(y => y.EndDate > DateTime.UtcNow))
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
 		}
@@ -235,12 +244,15 @@ namespace API.Data
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(username);
 
-			return await _context.Events
+			return await _context.Events.Include(x => x.EventDates)
 				.Where(e => e.City == user!.City && e.EventTags
 					.Where(et => user.UserInterests!
 						.Select(ui => ui.InterestName)
 						.Contains(et.EventTagName))
 						.Any())
+				.Where(x => x.EventDates!.Any(y => y.EndDate > DateTime.UtcNow))
+				.Where(x => !x.Participants.Any(y => y.UserName == username))
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
 		}
@@ -254,11 +266,14 @@ namespace API.Data
 		{
 			_context.Entry(appEvent).State = EntityState.Modified;
 		}
-		
+
 		public async Task<IEnumerable<EventDto>> GetInvitesAsync(string username)
 		{
 			var events = await _context.Events
 				.Where(x => x.InvitedToEvent!.Any(x => x.UserName == username))
+				.Where(x => x.EventDates.Any(y => y.EndDate > DateTime.UtcNow))
+				.Where(x => !x.Participants.Any(y => y.UserName == username))
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
 

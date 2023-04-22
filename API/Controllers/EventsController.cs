@@ -166,7 +166,7 @@ namespace API.Controllers
 				return Ok();
 			}
 
-			return BadRequest("Failed to participate in the event");
+			return BadRequest("Failed to stop participating in the event");
 		}
 
 		[HttpPut("updateevent/{eventId}")]
@@ -368,6 +368,16 @@ namespace API.Controllers
 			}
 			
 			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			
+			if (appEvent == null) 
+			{
+				return BadRequest("There's no event with this Id");
+			}
+			
+			if (appEvent.Participants.Any(x => x.UserName == recipient.UserName))
+			{
+				return BadRequest("This user is already participating in this event");
+			}
 			
 			var user = await _userRepository.GetUserByUsernameAsync(username);
 
