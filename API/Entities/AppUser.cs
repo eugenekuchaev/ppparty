@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities
 {
-    public class AppUser : IdentityUser<int>
+	public class AppUser : IdentityUser<int>
 	{
 		// Registration properties
 		public string FullName { get; set; } = null!;
@@ -40,5 +40,6 @@ namespace API.Entities
 		public ICollection<Event>? OwnedEvents { get; set; }
 		public ICollection<Event>? ParticipateInEvents { get; set; }
 		public ICollection<Event>? InvitedToEvents { get; set; }
+		public ICollection<EventNotification>? EventNotifications { get; set; }
 	}
 }

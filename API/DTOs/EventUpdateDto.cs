@@ -15,6 +15,7 @@ namespace API.DTOs
 		
 		// Time properties
 		public bool IsEnded { get; set; } = false;
+		public bool IsCancelled { get; set; } = false;
 		
 		// Location properties
 		[StringLength(56)]

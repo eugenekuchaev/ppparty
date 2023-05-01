@@ -83,6 +83,16 @@ namespace API.Controllers
 		[HttpPost]
 		public async Task<ActionResult> CreateEvent(EventDto eventDto)
 		{
+			if (eventDto.EventDates!.Any(x => x.StartDate > x.EndDate))
+			{
+				return BadRequest("End date cannot be earlier than start date");
+			}
+			
+			if (eventDto.EventDates!.Any(x => x.StartDate.AddDays(1) < x.EndDate))
+			{
+				return BadRequest("Start date and end date cannot differ for more than one day");
+			}
+			
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = _mapper.Map<Event>(eventDto);
 			string tags = eventDto.EventTagsString!;
@@ -144,6 +154,18 @@ namespace API.Controllers
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
+			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+
+			if (appEvent == null)
+			{
+				return BadRequest("There's no event with this Id");
+			}
+
+			if (appEvent.Participants!.Any(x => x.Username == user.UserName))
+			{
+				return BadRequest("You're already participating in this event");
+			}
+
 			await _eventRepository.AddUserToEventParticipantsAsync(eventId, user!.UserName);
 
 			if (await _eventRepository.SaveAllAsync())
@@ -153,11 +175,23 @@ namespace API.Controllers
 
 			return BadRequest("Failed to participate in the event");
 		}
-		
+
 		[HttpDelete("stopparticipatinginevent/{eventId}")]
 		public async Task<ActionResult> StopParticipatingInEvent(int eventId)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+
+			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+
+			if (appEvent == null)
+			{
+				return BadRequest("There's no event with this Id");
+			}
+
+			if (appEvent.EventOwner!.Username == user.UserName)
+			{
+				return BadRequest("You can't stop participating in your own event");
+			}
 
 			await _eventRepository.RemoveUserFromEventParticipantsAsync(eventId, user!.UserName);
 
@@ -172,6 +206,16 @@ namespace API.Controllers
 		[HttpPut("updateevent/{eventId}")]
 		public async Task<ActionResult> UpdateEvent(EventUpdateDto eventUpdateDto, int eventId)
 		{
+			if (eventUpdateDto.EventDates!.Any(x => x.StartDate > x.EndDate))
+			{
+				return BadRequest("End date cannot be earlier than start date");
+			}
+			
+			if (eventUpdateDto.EventDates!.Any(x => x.StartDate.AddDays(1) < x.EndDate))
+			{
+				return BadRequest("Start date and end date cannot differ for more than one day");
+			}
+			
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
 
@@ -179,13 +223,45 @@ namespace API.Controllers
 			{
 				return BadRequest("There's no event with this Id");
 			}
-			
+
 			if (appEvent.EventOwnerId != user!.Id)
 			{
 				return BadRequest("You are not the owner of this event");
 			}
 
-			_mapper.Map(eventUpdateDto, appEvent);
+			if (eventUpdateDto.EventDates != null)
+			{
+				bool areEventDatesEqual = appEvent.EventDates
+					.Select(ed => (ed.StartDate, ed.EndDate))
+					.SequenceEqual(eventUpdateDto.EventDates!
+						.Select(ed => (ed.StartDate, ed.EndDate)));
+
+				_mapper.Map(eventUpdateDto, appEvent);
+
+				appEvent.EventDates.Clear();
+
+				var newEventDates = _mapper.Map<IEnumerable<EventDate>>(eventUpdateDto.EventDates);
+				appEvent.EventDates = newEventDates.ToList();
+
+				if (!areEventDatesEqual)
+				{
+					foreach (var participant in appEvent.Participants!)
+					{
+						var notification = new EventNotification
+						{
+							NotificationMessage = $"{appEvent.EventName} dates have been changed.",
+							EventId = appEvent.Id,
+							EventName = appEvent.EventName!
+						};
+
+						await _eventRepository.NotifyEventParticipant(participant.Id, notification);
+					}
+				}
+			}
+			else 
+			{
+				return BadRequest("You have to add event dates");
+			}
 
 			_eventRepository.UpdateEvent(appEvent);
 
@@ -212,7 +288,7 @@ namespace API.Controllers
 			{
 				return BadRequest("There's no event with this Id");
 			}
-			
+
 			if (appEvent.EventOwnerId != user!.Id)
 			{
 				return BadRequest("You are not the owner of this event");
@@ -262,7 +338,7 @@ namespace API.Controllers
 			{
 				return BadRequest("There's no event with this Id");
 			}
-			
+
 			if (appEvent.EventOwnerId != user!.Id)
 			{
 				return BadRequest("You are not the owner of this event");
@@ -290,17 +366,17 @@ namespace API.Controllers
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
-			
+
 			if (appEvent == null)
 			{
 				return BadRequest("There's no event with this id");
 			}
-			
+
 			if (appEvent.EventOwnerId != user!.Id)
 			{
 				return BadRequest("You are not the owner of this event");
 			}
-			
+
 			var result = await _photoService.AddPhotoAsync(file, "event");
 
 			if (result.Error != null)
@@ -324,25 +400,25 @@ namespace API.Controllers
 
 			return BadRequest("Problem adding photo");
 		}
-		
+
 		[HttpDelete("deleteevent/{eventId}")]
 		public async Task<ActionResult> DeleteEvent(int eventId)
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
-			
+
 			if (appEvent == null)
 			{
 				return BadRequest("There's no event with this Id");
 			}
-			
+
 			if (appEvent.EventOwnerId != user!.Id)
 			{
 				return BadRequest("You are not the owner of this event");
 			}
-			
+
 			_eventRepository.DeleteEvent(appEvent);
-			
+
 			if (await _eventRepository.SaveAllAsync())
 			{
 				return NoContent();
@@ -350,35 +426,35 @@ namespace API.Controllers
 
 			return BadRequest("Failed to delete event");
 		}
-		
+
 		[HttpPut("invitetoevent/{eventId}")]
 		public async Task<ActionResult> InviteToEvent(string username, int eventId)
 		{
 			var sender = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 			var recipient = await _userRepository.GetUserByUsernameAsync(username);
-			
+
 			if (recipient == null)
 			{
 				return BadRequest("There's no such a user");
 			}
-			
+
 			if (!await _friendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
 			{
 				return BadRequest("You are not friends with this user");
 			}
-			
+
 			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
-			
-			if (appEvent == null) 
+
+			if (appEvent == null)
 			{
 				return BadRequest("There's no event with this Id");
 			}
-			
+
 			if (appEvent.Participants.Any(x => x.UserName == recipient.UserName))
 			{
 				return BadRequest("This user is already participating in this event");
 			}
-			
+
 			var user = await _userRepository.GetUserByUsernameAsync(username);
 
 			await _eventRepository.AddUserToInvitedToEventAsync(eventId, user!.UserName);
@@ -390,13 +466,13 @@ namespace API.Controllers
 
 			return BadRequest("Failed to invite user to the event");
 		}
-		
+
 		[HttpGet("invites")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetInvites()
 		{
 			return Ok(await _eventRepository.GetInvitesAsync(User.GetUsername()));
 		}
-		
+
 		[HttpDelete("declineinvitation/{eventId}")]
 		public async Task<ActionResult> DeclineInvitation(int eventId)
 		{
@@ -410,6 +486,70 @@ namespace API.Controllers
 			}
 
 			return BadRequest("Failed to decline invitation");
+		}
+
+		[HttpPut("cancelevent/{eventId}")]
+		public async Task<ActionResult> CancelEvent(int eventId)
+		{
+			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+
+			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+
+			if (appEvent == null)
+			{
+				return BadRequest("There's no event with this Id");
+			}
+
+			if (appEvent.EventOwner!.Username != user.UserName)
+			{
+				return BadRequest("You are not the owner of this event");
+			}
+			
+			if (appEvent.IsCancelled == true)
+			{
+				return BadRequest("This event has already been cancelled");
+			}
+
+			await _eventRepository.CancelEvent(eventId);
+
+			foreach (var participant in appEvent.Participants!)
+			{
+				var notification = new EventNotification
+				{
+					NotificationMessage = $"{appEvent.EventName} has been cancelled.",
+					EventId = appEvent.Id,
+					EventName = appEvent.EventName!
+				};
+
+				await _eventRepository.NotifyEventParticipant(participant.Id, notification);
+			}
+
+			if (await _eventRepository.SaveAllAsync())
+			{
+				return Ok();
+			}
+
+			return BadRequest("Failed to cancel the event");
+		}
+
+		[HttpGet("eventnotifications")]
+		public async Task<ActionResult<IEnumerable<EventNotification>>> GetEventNotifications()
+		{
+			return Ok(await _eventRepository.GetEventNotificationsAsync(User.GetUsername()));
+		}
+
+		[HttpPut("readeventnotification/{notificationId}")]
+		public async Task<ActionResult> ReadEventNotification(int notificationId)
+		{
+			await _eventRepository.ReadEventNotification(notificationId);
+			await _eventRepository.SaveAllAsync();
+			return Ok();
+		}
+		
+		[HttpGet("numberofownedevents/{username}")]
+		public async Task<ActionResult<int>> GetNumberOfOwnedEvents(string username)
+		{
+			return await _eventRepository.GetNumberOfOwnedEvents(username);
 		}
 	}
 }

@@ -42,11 +42,37 @@
                 </div>
             </li>
             <li class="nav-item mb-1">
-                <div *ngIf="eventInvitesIsActivated == true">
+                <div *ngIf="eventInvitesIsActivated == true && invites.length > 0">
+                    <a class="nav-link active" (click)="clickOnEventInvites()">Invites
+                        <span class="badge rounded-pill bg-warning">{{invites.length}}</span>
+                    </a>
+                </div>
+                <div *ngIf="eventInvitesIsActivated == false && invites.length > 0">
+                    <a class="nav-link" (click)="clickOnEventInvites()">Invites
+                        <span class="badge rounded-pill bg-warning">{{invites.length}}</span>
+                    </a>
+                </div>
+                <div *ngIf="eventInvitesIsActivated == true && invites.length === 0">
                     <a class="nav-link active" (click)="clickOnEventInvites()">Invites</a>
                 </div>
-                <div *ngIf="eventInvitesIsActivated == false">
+                <div *ngIf="eventInvitesIsActivated == false && invites.length === 0">
                     <a class="nav-link" (click)="clickOnEventInvites()">Invites</a>
+                </div>
+            </li>
+            <li class="nav-item mb-1">
+                <div *ngIf="eventNotificationsIsActivated == true">
+                    <a class="nav-link active">Notifications</a>
+                </div>
+                <div *ngIf="eventNotificationsIsActivated == false && getNumberOfUnreadNotifications() === 0">
+                    <a class="nav-link" (click)="clickOnEventNotifications()">Notifications</a>
+                </div>
+                <div *ngIf="eventNotificationsIsActivated == false && getNumberOfUnreadNotifications() > 0 && !hideNotificationBadges">
+                    <a class="nav-link" (click)="clickOnEventNotificationsWhenUnreadNotifications()">Notifications 
+                        <span class="badge rounded-pill bg-warning">{{getNumberOfUnreadNotifications()}}</span>
+                    </a>
+                </div>
+                <div *ngIf="eventNotificationsIsActivated == false && hideNotificationBadges">
+                    <a class="nav-link" (click)="clickOnEventNotifications()">Notifications</a>
                 </div>
             </li>
             <li class="nav-item mt-3" *ngIf="allEventsIsActivated">
@@ -203,7 +229,8 @@
                             [participatedEvents]="participatedEvents"
                             [ownedEvents]="ownedEvents"
                             [friendsEvents]="friendsEvents"
-                            [invites]="invites">
+                            [invites]="invites"
+                            [showButtonsInOwned]="true">
                         </app-event-card>
                     </ng-container>
                 </div>
@@ -225,7 +252,8 @@
                             [participatedEvents]="participatedEvents"
                             [ownedEvents]="ownedEvents"
                             [friendsEvents]="friendsEvents"
-                            [invites]="invites">
+                            [invites]="invites"
+                            [showButtonsInOwned]="true">
                         </app-event-card>
                     </ng-container>
                 </div>
@@ -268,6 +296,19 @@
                         [invites]="invites"
                         [showInviteButtons]="true">
                     </app-event-card>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="eventNotificationsIsActivated == true">
+            <div class="row">
+                <div *ngIf="eventNotifications.length === 0">
+                    <h5 class="text-center">You don't have any notifications.</h5>
+                </div>
+                <div *ngFor="let notification of eventNotifications">
+                    <app-event-notifications 
+                        [notification]="notification">
+                    </app-event-notifications>
                 </div>
             </div>
         </div>

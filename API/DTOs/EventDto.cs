@@ -22,10 +22,17 @@ namespace API.DTOs
 		{
 			get
 			{
+				if (IsCancelled == true)
+				{
+					return true;
+				}
+				
 				var latestDate = EventDates!.Max(ed => ed.EndDate);
 				return latestDate < DateTime.UtcNow;
 			}
 		}
+		
+		public bool IsCancelled { get; set; } = false;
 
 		// Location properties
 		[StringLength(56)]

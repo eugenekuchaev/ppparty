@@ -9,6 +9,7 @@ namespace API.Entities
 		
 		// Time properties
 		public bool IsEnded { get; set; } = false;
+		public bool IsCancelled { get; set; } = false;
 		
 		// Location properties
 		public string Country { get; set; } = null!;

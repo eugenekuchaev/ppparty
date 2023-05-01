@@ -7,6 +7,8 @@ import { HttpClient } from '@angular/common/http';
 import { AccountService } from './account.service';
 import { map, of, take } from 'rxjs';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
+import { EventNotification } from '../_models/eventNotification';
+import { AppEventDetail } from '../_models/appEventDetail';
 
 @Injectable({
   providedIn: 'root'
@@ -65,16 +67,8 @@ export class EventsService {
     )
   }
 
-  getEvent(id: number) {
-    const appEvent = [...this.eventCache.values()]
-      .reduce((array, element) => array.concat(element.result), [])
-      .find((appEvent: AppEvent) => appEvent.id === id);
-
-    if (appEvent) {
-      return of(appEvent);
-    }
-
-    return this.http.get<AppEvent>(this.baseUrl + 'events/' + id);
+  getEvent(eventId: string) {
+    return this.http.get<AppEventDetail>(this.baseUrl + 'events/' + eventId);
   }
 
   getOwnedEvents() {
@@ -91,6 +85,10 @@ export class EventsService {
 
   getRecommendedEvents() {
     return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/recommendedevents');
+  }
+
+  getEventNotifications() {
+    return this.http.get<Partial<EventNotification[]>>(this.baseUrl + 'events/eventnotifications');
   }
 
   createEvent(appEvent: AppEvent) {
@@ -132,6 +130,18 @@ export class EventsService {
 
   declineInvitation(eventId: Number) {
     return this.http.delete(this.baseUrl + 'events/declineinvitation/' + eventId);
+  }
+
+  cancelEvent(eventId: Number) {
+    return this.http.put(this.baseUrl + 'events/cancelevent/' + eventId, {});
+  }
+
+  readEventNotification(notificationId: Number) {
+    return this.http.put(this.baseUrl + 'events/readeventnotification/' + notificationId, {});
+  }
+
+  getNumberOfOwnedEvents(username: String) {
+    return this.http.get<Number>(this.baseUrl + 'events/numberofownedevents/' + username);
   }
 
   getEventParams() {

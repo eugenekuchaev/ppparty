@@ -21,8 +21,8 @@ export class EventCardComponent implements OnInit {
   @Input() showButtonsInAll: boolean = false;
   @Input() showCancelButtonInParticipated: boolean = false;
   @Input() showFriendsEventsButtons: boolean = false;
+  @Input() showButtonsInOwned: boolean = false;
   shortenedEventDescription: string;
-  eventIsParticipated: boolean;
 
   constructor(private eventsService: EventsService) { }
 
@@ -82,8 +82,24 @@ export class EventCardComponent implements OnInit {
     })
   }
 
+  cancelEvent(appEvent: AppEvent) {
+    const confirmation = confirm("Are you sure you want to delete this event?");
+    if (confirmation) {
+      this.eventsService.cancelEvent(appEvent.id).subscribe({
+        next: () => {
+          appEvent.isEnded = true;
+        }
+      });
+    } else {
+    }
+  }
+
   checkIfEventIsInParticipated(appEvent: AppEvent) {
-    return this.eventIsParticipated = this.participatedEvents.some(obj => obj.id === appEvent.id);
+    return this.participatedEvents.some(obj => obj.id === appEvent.id);
+  }
+
+  checkIfEventIsInOwned(appEvent: AppEvent) {
+    return this.ownedEvents.some(obj => obj.id === appEvent.id);
   }
 
   formatEarliestDate(appEvent: AppEvent): string {

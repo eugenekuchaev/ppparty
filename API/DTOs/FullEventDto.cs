@@ -8,9 +8,24 @@ namespace API.DTOs
 		public int Id { get; set; }
 		public string? EventName { get; set; } 
 		public string? Description { get; set; } 
+		public string? EventPhotoUrl { get; set; }
 		
 		// Time properties
-		public bool IsEnded { get; set; } = false;
+		public bool IsEnded
+		{
+			get
+			{
+				if (IsCancelled == true)
+				{
+					return true;
+				}
+				
+				var latestDate = EventDates!.Max(ed => ed.EndDate);
+				return latestDate < DateTime.UtcNow;
+			}
+		}
+		
+		public bool IsCancelled { get; set; } = false;
 		
 		// Location properties
 		public string? Country { get; set; } 

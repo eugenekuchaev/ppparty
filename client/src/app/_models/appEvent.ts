@@ -8,6 +8,7 @@ export interface AppEvent {
     description: string;
     eventPhotoUrl: string;
     isEnded: boolean;
+    isCancelled: boolean;
     country: string;
     region: string;
     city: string;

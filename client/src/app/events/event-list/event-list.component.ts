@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { AppEvent } from 'src/app/_models/appEvent';
+import { EventNotification } from 'src/app/_models/eventNotification';
 import { EventParams } from 'src/app/_models/eventParams';
 import { Pagination } from 'src/app/_models/pagination';
 import { User } from 'src/app/_models/user';
@@ -18,6 +18,7 @@ export class EventListComponent implements OnInit {
   ownedEvents: AppEvent[] = [];
   friendsEvents: AppEvent[] = [];
   invites: AppEvent[] = [];
+  eventNotifications: EventNotification[] = [];
   pagination: Pagination;
   eventParams: EventParams;
   user: User;
@@ -27,13 +28,18 @@ export class EventListComponent implements OnInit {
   ownedEventsIsActivated = false;
   friendsEventsIsActivated = false;
   eventInvitesIsActivated = false;
+  eventNotificationsIsActivated = false;
   searchOpen = false;
   showEndedParticipatedEvents = false;
   showEndedOwnedEvents = false;
+  hideNotificationBadges = false;
 
   ngOnInit(): void {
     this.loadRecommendedEvents();
     this.loadParticipatedEvents();
+    this.loadOwnedEvents();
+    this.loadInvites();
+    this.loadEventNotifications();
   }
 
   constructor(private eventsService: EventsService) {
@@ -90,6 +96,23 @@ export class EventListComponent implements OnInit {
     })
   }
 
+  loadEventNotifications() {
+    this.eventsService.getEventNotifications().subscribe({
+      next: response => {
+        this.eventNotifications = response;
+      }
+    })
+  }
+
+  getNumberOfUnreadNotifications() {
+    return this.eventNotifications.filter(notification => !notification.read).length;
+  }
+
+  clickOnEventNotificationsWhenUnreadNotifications() {
+    this.clickOnEventNotifications();
+    this.hideNotificationBadges = true;
+  }
+
   clickOnSearch() {
     this.searchOpen = !this.searchOpen;
   }
@@ -114,13 +137,13 @@ export class EventListComponent implements OnInit {
   }
 
   clickOnRecommendedEvents() {
-    this.loadRecommendedEvents();
     this.recommendedEventsIsActivated = true;
     this.allEventsIsActivated = false;
     this.participatedEventsIsActivated = false;
     this.ownedEventsIsActivated = false;
     this.friendsEventsIsActivated = false;
     this.eventInvitesIsActivated = false;
+    this.eventNotificationsIsActivated = false;
   }
 
   clickOnAllEvents() {
@@ -131,6 +154,7 @@ export class EventListComponent implements OnInit {
     this.ownedEventsIsActivated = false;
     this.friendsEventsIsActivated = false;
     this.eventInvitesIsActivated = false;
+    this.eventNotificationsIsActivated = false;
   }
 
   clickOnParticipatedEvents() {
@@ -140,16 +164,17 @@ export class EventListComponent implements OnInit {
     this.ownedEventsIsActivated = false;
     this.friendsEventsIsActivated = false;
     this.eventInvitesIsActivated = false;
+    this.eventNotificationsIsActivated = false;
   }
 
   clickOnOwnedEvents() {
-    this.loadOwnedEvents();
     this.recommendedEventsIsActivated = false;
     this.allEventsIsActivated = false;
     this.participatedEventsIsActivated = false;
     this.ownedEventsIsActivated = true;
     this.friendsEventsIsActivated = false;
     this.eventInvitesIsActivated = false;
+    this.eventNotificationsIsActivated = false;
   }
 
   clickOnFriendsEvents() {
@@ -160,15 +185,26 @@ export class EventListComponent implements OnInit {
     this.ownedEventsIsActivated = false;
     this.friendsEventsIsActivated = true;
     this.eventInvitesIsActivated = false;
+    this.eventNotificationsIsActivated = false;
   }
 
   clickOnEventInvites() {
-    this.loadInvites();
     this.recommendedEventsIsActivated = false;
     this.allEventsIsActivated = false;
     this.participatedEventsIsActivated = false;
     this.ownedEventsIsActivated = false;
     this.friendsEventsIsActivated = false;
     this.eventInvitesIsActivated = true;
+    this.eventNotificationsIsActivated = false;
+  }
+
+  clickOnEventNotifications() {
+    this.recommendedEventsIsActivated = false;
+    this.allEventsIsActivated = false;
+    this.participatedEventsIsActivated = false;
+    this.ownedEventsIsActivated = false;
+    this.friendsEventsIsActivated = false;
+    this.eventInvitesIsActivated = false;
+    this.eventNotificationsIsActivated = true;
   }
 }

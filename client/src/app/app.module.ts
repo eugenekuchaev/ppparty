@@ -34,6 +34,8 @@ import { UserManagementComponent } from './admin/user-management/user-management
 import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
 import { RolesModalComponent } from './modals/roles-modal/roles-modal.component';
 import { EventCardComponent } from './events/event-card/event-card.component';
+import { EventDetailComponent } from './events/event-detail/event-detail.component';
+import { EventNotificationsComponent } from './events/event-notifications/event-notifications.component';
 
 @NgModule({
   declarations: [
@@ -60,7 +62,9 @@ import { EventCardComponent } from './events/event-card/event-card.component';
     UserManagementComponent,
     PhotoManagementComponent,
     RolesModalComponent,
-    EventCardComponent
+    EventCardComponent,
+    EventDetailComponent,
+    EventNotificationsComponent
   ],
   imports: [
     BrowserModule,

@@ -3,18 +3,22 @@
         <div class="col">
             <div class="d-flex align-items-center h-100 justify-content-center pl-3">
                 <div>
-                    <img src="{{appEvent.eventPhotoUrl}}" alt="{{appEvent.eventName}}" class="img-fluid">
+                    <img src="{{appEvent.eventPhotoUrl}}" alt="{{appEvent.eventName}}" class="img-fluid" routerLink="/events/{{appEvent.id}}">
                 </div>
             </div>
         </div>
         <div class="col-md-9">
             <div class="card-body p-4"> 
-                <h5 class="card-title mb-1 mt-1">{{appEvent.eventName}}</h5>
-                <p>{{shortenedEventDescription}}</p>
+                <h5 class="card-title mb-1 mt-1" routerLink="/events/{{appEvent.id}}">{{appEvent.eventName}}</h5>
+                <p routerLink="/events/{{appEvent.id}}">{{shortenedEventDescription}}</p>
                 <div class="d-flex mb-2">
-                    <h6 class="event-info text-muted"><i class="fa fa-map-marker fa-lg"></i> {{appEvent.city}}</h6>
-                    <h6 class="event-info text-muted"><i class="fa fa-clock-o fa-lg"></i> {{formatEarliestDate(appEvent)}}</h6>
-                    <h6 class="event-info text-muted" *ngIf="appEvent.price === 0">
+                    <h6 class="event-info text-muted" routerLink="/events/{{appEvent.id}}">
+                        <i class="fa fa-map-marker fa-lg"></i> {{appEvent.city}}
+                    </h6>
+                    <h6 class="event-info text-muted" routerLink="/events/{{appEvent.id}}">
+                        <i class="fa fa-clock-o fa-lg"></i> {{formatEarliestDate(appEvent)}}
+                    </h6>
+                    <h6 class="event-info text-muted" *ngIf="appEvent.price === 0" routerLink="/events/{{appEvent.id}}">
                         <i class="fa fa-money fa-lg"></i> Free
                     </h6>
                     <h6 class="event-info text-muted" *ngIf="appEvent.price > 0">
@@ -22,7 +26,7 @@
                     </h6>
                 </div>
                 <ng-container *ngFor="let eventTag of appEvent.eventTags">
-                    <span class="badge bg-primary">
+                    <span class="badge bg-primary" routerLink="/events/{{appEvent.id}}">
                         {{eventTag.eventTagName}}
                     </span>
                 </ng-container>
@@ -38,7 +42,7 @@
                 </div>
                 <div 
                     class="position-absolute bottom-0 end-0 mb-3 me-3" 
-                    *ngIf="showButtonsInAll && !checkIfEventIsInParticipated(appEvent)">
+                    *ngIf="showButtonsInAll && !checkIfEventIsInParticipated(appEvent) && !checkIfEventIsInOwned(appEvent)">
                         <button 
                             class="btn btn-success" 
                             type="button" 
@@ -54,6 +58,15 @@
                             type="button" 
                             (click)="stopParticipatingInEvent(appEvent)">
                                 Cancel
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInAll && checkIfEventIsInOwned(appEvent)">
+                        <button 
+                            class="btn btn-info disabled" 
+                            type="button">
+                                Owned
                         </button>
                 </div>
                 <div 
@@ -80,7 +93,7 @@
                     class="position-absolute bottom-0 end-0 mb-3 me-3" 
                     *ngIf="showInviteButtons">
                         <button 
-                            class="btn btn-success accept-invite-button" 
+                            class="btn btn-success second-button" 
                             type="button" 
                             (click)="participateInEvent(appEvent)">
                                 Accept
@@ -102,7 +115,32 @@
                                 Cancel
                         </button>
                 </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInOwned && appEvent.isEnded === false">
+                        <button 
+                            class="btn btn-success second-button" 
+                            type="button">
+                                Edit
+                        </button>
+                        <button 
+                            class="btn btn-danger" 
+                            type="button" 
+                            (click)="cancelEvent(appEvent)">
+                                Cancel event
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInOwned && appEvent.isEnded === true">
+                        <button 
+                            class="btn btn-success" 
+                            type="button">
+                                Edit
+                        </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+  

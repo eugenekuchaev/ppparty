@@ -1,0 +1,14 @@
+<div class="card mb-3" *ngIf="notification">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="card-body p-4"> 
+                <span>{{notification.timeStamp | date: 'medium'}}</span>
+                <h5 class="card-title mb-1 mt-1">{{notification.notificationMessage}}</h5>
+                <a routerLink="/events/{{notification.eventId}}">Take a look</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+  
+

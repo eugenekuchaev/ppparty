@@ -71,6 +71,28 @@ namespace API.Data
 			}
 		}
 
+		public async Task CancelEvent(int eventId)
+		{
+			var appEvent = await _context.Events
+				.FirstOrDefaultAsync(x => x.Id == eventId);
+
+			if (appEvent != null)
+			{
+				appEvent.IsCancelled = true;
+				appEvent.IsEnded = true;
+			}
+		}
+
+		public async Task NotifyEventParticipant(int userId, EventNotification notification)
+		{
+			var appUser = await _context.Users
+				.Where(x => x.Id == userId)
+				.Include(x => x.EventNotifications)
+				.SingleOrDefaultAsync();
+
+			appUser!.EventNotifications!.Add(notification);
+		}
+
 		public async Task RemoveUserFromEventInvitationsAsync(int eventId, string username)
 		{
 			var appEvent = await _context.Events
@@ -134,9 +156,9 @@ namespace API.Data
 				query = query.Where(u => u.EventTags!.Any(i =>
 					i.EventTagName.ToLower() == eventParams.EventTag.ToLower()));
 			}
-			
+
 			query = query
-				.Where(x => x.EventDates.Any(y => y.EndDate > DateTime.UtcNow))
+				.Where(x => x.IsEnded != true)
 				.OrderBy(x => x.EventDates!.Min(y => y.StartDate));
 
 			return await PagedList<EventDto>.CreateAsync(
@@ -172,6 +194,8 @@ namespace API.Data
 						eventDto.FriendsParticipants = friendsParticipants;
 					}
 				}
+
+				eventDto.EventPhotoUrl = eventDto!.EventPhoto!.PhotoUrl;
 			}
 
 			return eventDto;
@@ -184,6 +208,7 @@ namespace API.Data
 				.Include(x => x.EventTags)
 				.Include(x => x.EventPhoto)
 				.Include(x => x.Participants)
+				.Include(x => x.EventDates)
 				.SingleOrDefaultAsync();
 		}
 
@@ -212,6 +237,7 @@ namespace API.Data
 		{
 			var events = await _context.Events
 				.Where(x => x.Participants.Any(x => x.UserName == username))
+				.Where(x => x.EventOwner.UserName != username)
 				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
@@ -244,7 +270,7 @@ namespace API.Data
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(username);
 
-			return await _context.Events.Include(x => x.EventDates)
+			return await _context.Events.Include(x => x.EventDates).Include(x => x.EventOwner)
 				.Where(e => e.City == user!.City && e.EventTags
 					.Where(et => user.UserInterests!
 						.Select(ui => ui.InterestName)
@@ -252,6 +278,7 @@ namespace API.Data
 						.Any())
 				.Where(x => x.EventDates!.Any(y => y.EndDate > DateTime.UtcNow))
 				.Where(x => !x.Participants.Any(y => y.UserName == username))
+				.Where(x => x.EventOwner.UserName != username)
 				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();
@@ -283,6 +310,31 @@ namespace API.Data
 			}
 
 			return new List<EventDto>();
+		}
+
+		public async Task<IEnumerable<EventNotification>> GetEventNotificationsAsync(string username)
+		{
+			return await _context.EventNotifications
+				.Where(x => x.Recipients.Any(y => y.UserName == username))
+				.OrderByDescending(x => x.TimeStamp)
+				.ToListAsync();
+		}
+
+		public async Task ReadEventNotification(int notificationId)
+		{
+			var notification = await _context.EventNotifications.Where(x => x.Id == notificationId).SingleOrDefaultAsync();
+
+			if (notification != null)
+			{
+				notification.Read = true;
+			}
+		}
+		
+		public async Task<int> GetNumberOfOwnedEvents(string username)
+		{
+			return await _context.Events
+				.Where(x => x.EventOwner.UserName == username)
+				.CountAsync();
 		}
 	}
 }

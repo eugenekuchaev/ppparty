@@ -10,19 +10,39 @@
                 </div>
             </li>
             <li class="nav-item mb-1" *ngIf="mutualFriends">
-                <div *ngIf="friendsIsActivated == true">
-                    <a class="nav-link active" (click)="clickOnFriends()">Friends ({{mutualFriends.length}})</a>
+                <div *ngIf="friendsIsActivated == true && mutualFriends.length > 0">
+                    <a class="nav-link active" (click)="clickOnFriends()">Friends
+                        <span class="badge rounded-pill bg-success">{{mutualFriends.length}}</span>
+                    </a>
                 </div>
-                <div *ngIf="friendsIsActivated == false">
-                    <a class="nav-link" (click)="clickOnFriends()">Friends ({{mutualFriends.length}})</a>
+                <div *ngIf="friendsIsActivated == false && mutualFriends.length > 0">
+                    <a class="nav-link" (click)="clickOnFriends()">Friends
+                        <span class="badge rounded-pill bg-success">{{mutualFriends.length}}</span>
+                    </a>
+                </div>
+                <div *ngIf="friendsIsActivated == true && mutualFriends.length === 0">
+                    <a class="nav-link active" (click)="clickOnFriends()">Friends</a>
+                </div>
+                <div *ngIf="friendsIsActivated == false && mutualFriends.length === 0">
+                    <a class="nav-link" (click)="clickOnFriends()">Friends</a>
                 </div>
             </li>
             <li class="nav-item mb-1" *ngIf="friendRequests">
-                <div *ngIf="friendRequestsIsActivated == true">
-                    <a class="nav-link active" (click)="clickOnFriendRequests()">Friend requests ({{friendRequests.length}})</a>
+                <div *ngIf="friendRequestsIsActivated == true && friendRequests.length > 0">
+                    <a class="nav-link active" (click)="clickOnFriendRequests()">Friend requests
+                        <span class="badge rounded-pill bg-warning">{{friendRequests.length}}</span>
+                    </a>
                 </div>
-                <div *ngIf="friendRequestsIsActivated == false">
-                    <a class="nav-link" (click)="clickOnFriendRequests()">Friend requests ({{friendRequests.length}})</a>
+                <div *ngIf="friendRequestsIsActivated == false && friendRequests.length > 0">
+                    <a class="nav-link" (click)="clickOnFriendRequests()">Friend requests
+                        <span class="badge rounded-pill bg-warning">{{friendRequests.length}}</span>
+                    </a>
+                </div>
+                <div *ngIf="friendRequestsIsActivated == true && friendRequests.length === 0">
+                    <a class="nav-link active" (click)="clickOnFriendRequests()">Friend requests</a>
+                </div>
+                <div *ngIf="friendRequestsIsActivated == false && friendRequests.length === 0">
+                    <a class="nav-link" (click)="clickOnFriendRequests()">Friend requests</a>
                 </div>
             </li>
             <li class="nav-item mt-3" *ngIf="allMembersIsActivated">

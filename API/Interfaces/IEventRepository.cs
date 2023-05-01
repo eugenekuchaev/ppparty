@@ -24,5 +24,10 @@ namespace API.Interfaces
 		Task AddUserToInvitedToEventAsync(int eventId, string username);
 		Task<IEnumerable<EventDto>> GetInvitesAsync(string username);
 		Task RemoveUserFromEventInvitationsAsync(int eventId, string username);
+		Task CancelEvent(int eventId);
+		Task NotifyEventParticipant(int userId, EventNotification notification);
+		Task<IEnumerable<EventNotification>> GetEventNotificationsAsync(string username);
+		Task ReadEventNotification(int notificationId);
+		Task<int> GetNumberOfOwnedEvents(string username);
 	}
 }

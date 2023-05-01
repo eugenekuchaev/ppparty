@@ -14,6 +14,7 @@ import { MemberMessagesComponent } from './messages/member-messages/member-messa
 import { MessagesComponent } from './messages/messages.component';
 import { AdminGuard } from './_guards/admin.guard';
 import { AuthGuard } from './_guards/auth.guard';
+import { EventDetailComponent } from './events/event-detail/event-detail.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -29,7 +30,8 @@ const routes: Routes = [
       {path: 'messages', component: MessagesComponent},
       {path: 'member/security', component: MemberSecurityComponent},
       {path: 'messages/:username', component: MemberMessagesComponent},
-      {path: 'admin', component: AdminPanelComponent, canActivate: [AdminGuard]}
+      {path: 'admin', component: AdminPanelComponent, canActivate: [AdminGuard]},
+      {path: 'events/:eventId', component: EventDetailComponent}
     ]
   },
   {path: 'errors', component: TestErrorsComponent}, 

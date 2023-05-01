@@ -1,0 +1,36 @@
+body {
+    background: #eee;
+}
+
+.card {
+    border: none;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.fonts {
+    font-size: 16px;
+}
+
+.badge {
+    margin-right: 5px;
+}
+
+.btn {
+    margin-inline: 10px;
+}
+
+.price {
+    margin-top: 7px;
+    margin-right: 10px;
+}
+
+.custom-card {
+    max-width: 89%;
+    background-color: #fafafa;
+}
+
+.second-button {
+    margin-right: 10px;
+}
