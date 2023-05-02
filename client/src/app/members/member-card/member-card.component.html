@@ -27,10 +27,10 @@
                         <button class="btn btn-sm btn-success" routerLink="/messages/{{member.username}}">
                             <i class="fa fa-envelope"></i>
                         </button>
-                        <button class="btn btn-sm btn-primary" *ngIf="isMemberAMutualFriend() === true">
+                        <button class="btn btn-sm btn-primary" routerLink="/events/invitefrommembers/{{member.username}}">
                             <i class="fa fa-plus"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" *ngIf="isMemberAMutualFriend() === true" (click)="deleteFriend(member)">
+                        <button class="btn btn-sm btn-danger" (click)="deleteFriend(member)">
                             <i class="fa fa-remove"></i>
                         </button>
                     </div>

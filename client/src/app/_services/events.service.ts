@@ -144,6 +144,14 @@ export class EventsService {
     return this.http.get<Number>(this.baseUrl + 'events/numberofownedevents/' + username);
   }
 
+  getEventsForInvitations(friendUsername: String) {
+    return this.http.get<AppEvent[]>(this.baseUrl + 'events/eventsforinvitations' + '?friendUsername=' + friendUsername);
+  }
+
+  checkIfUserHasBeenInvited(username: String, eventId: Number) {
+    return this.http.get<Boolean>(this.baseUrl + 'events/hasuserbeeninvitedtoevent' + '?username=' + username + "&eventId=" + eventId);
+  }
+
   getEventParams() {
     return this.eventParams;
   }

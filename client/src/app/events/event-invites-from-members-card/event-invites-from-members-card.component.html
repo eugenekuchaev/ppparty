@@ -1,0 +1,20 @@
+<div class="card mb-3" *ngIf="appEvent">
+  <div class="row align-items-center">
+    <div class="col-6">
+      <div class="card-body p-4 d-flex align-items-center">
+        <h6 class="card-title mb-0">
+          <a [routerLink]="['/events', appEvent.id]">{{appEvent.eventName}}</a>
+        </h6>
+      </div>
+      
+    </div>
+    <div class="col-6">
+      <div class="card-body p-4 d-flex justify-content-end align-items-center" *ngIf="!hasBeenInvited">
+        <button class="btn btn-success" (click)="inviteToEvent()">Invite</button>
+      </div>
+      <div class="card-body p-4 d-flex justify-content-end align-items-center" *ngIf="hasBeenInvited">
+        <button class="btn btn-dark disabled">Invited</button>
+      </div>
+    </div>
+  </div>
+</div>

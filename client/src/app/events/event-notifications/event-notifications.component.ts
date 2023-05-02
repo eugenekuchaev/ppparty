@@ -14,7 +14,6 @@ export class EventNotificationsComponent implements OnInit{
 
   ngOnInit(): void {
     this.readEventNotification();
-
   }
 
   readEventNotification() {

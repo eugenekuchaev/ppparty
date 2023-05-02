@@ -551,5 +551,17 @@ namespace API.Controllers
 		{
 			return await _eventRepository.GetNumberOfOwnedEvents(username);
 		}
+		
+		[HttpGet("eventsforinvitations")]
+		public async Task<ActionResult<IEnumerable<EventDto>>> GetEventsForInvitations(string friendUsername)
+		{
+			return Ok(await _eventRepository.GetActualParticipatedAndOwnedEvents(User.GetUsername(), friendUsername));
+		}
+		
+		[HttpGet("hasuserbeeninvitedtoevent")]
+		public ActionResult<bool> CheckIfUserHasBeenInvited(string username, int eventId)
+		{
+			return Ok(_eventRepository.CheckIfUserHasBeenInvited(username, eventId));
+		}
 	}
 }

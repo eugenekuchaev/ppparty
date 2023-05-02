@@ -1,0 +1,20 @@
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-6 mx-auto">
+            <div>
+                <div class="row">
+                    <div *ngIf="eventsForInvitations.length === 0">
+                        <h5 class="text-center">
+                            You don't have appropriate events to invite friends to. You can only invite friends to
+                            events when you're participating in them or when you own them.
+                        </h5>
+                    </div>
+                    <div *ngFor="let appEvent of eventsForInvitations">
+                        <app-event-invites-from-members-card [appEvent]="appEvent"
+                            [username]="friendUsername"></app-event-invites-from-members-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

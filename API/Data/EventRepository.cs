@@ -158,7 +158,8 @@ namespace API.Data
 			}
 
 			query = query
-				.Where(x => x.IsEnded != true)
+				.Where(x => x.IsCancelled != true)
+				.Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now)
 				.OrderBy(x => x.EventDates!.Min(y => y.StartDate));
 
 			return await PagedList<EventDto>.CreateAsync(
@@ -329,12 +330,31 @@ namespace API.Data
 				notification.Read = true;
 			}
 		}
-		
+
 		public async Task<int> GetNumberOfOwnedEvents(string username)
 		{
 			return await _context.Events
 				.Where(x => x.EventOwner.UserName == username)
 				.CountAsync();
+		}
+
+		public async Task<IEnumerable<EventDto>> GetActualParticipatedAndOwnedEvents(string username, string friendUsername)
+		{
+			return await _context.Events
+				.Where(x => x.Participants.Any(y => y.UserName == username) || x.EventOwner.UserName == username)
+				.Where(x => !x.IsCancelled)
+				.Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now)
+				.Where(x => !x.Participants.Any(y => y.UserName == friendUsername))
+				.Where(x => x.EventOwner.UserName != friendUsername)
+				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
+				.ToListAsync();
+		}
+		
+		public bool CheckIfUserHasBeenInvited(string username, int eventId) 
+		{
+			return _context.Users
+				.Where(x => x.UserName == username)
+				.Any(x => x.InvitedToEvents!.Any(y => y.Id == eventId));
 		}
 	}
 }

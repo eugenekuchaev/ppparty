@@ -36,6 +36,8 @@ import { RolesModalComponent } from './modals/roles-modal/roles-modal.component'
 import { EventCardComponent } from './events/event-card/event-card.component';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
 import { EventNotificationsComponent } from './events/event-notifications/event-notifications.component';
+import { EventInvitesFromMembersComponent } from './events/event-invites-from-members/event-invites-from-members.component';
+import { EventInvitesFromMembersCardComponent } from './events/event-invites-from-members-card/event-invites-from-members-card.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +66,9 @@ import { EventNotificationsComponent } from './events/event-notifications/event-
     RolesModalComponent,
     EventCardComponent,
     EventDetailComponent,
-    EventNotificationsComponent
+    EventNotificationsComponent,
+    EventInvitesFromMembersComponent,
+    EventInvitesFromMembersCardComponent
   ],
   imports: [
     BrowserModule,

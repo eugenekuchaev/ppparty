@@ -29,5 +29,7 @@ namespace API.Interfaces
 		Task<IEnumerable<EventNotification>> GetEventNotificationsAsync(string username);
 		Task ReadEventNotification(int notificationId);
 		Task<int> GetNumberOfOwnedEvents(string username);
+		Task<IEnumerable<EventDto>> GetActualParticipatedAndOwnedEvents(string username, string friendUsername);
+		bool CheckIfUserHasBeenInvited(string username, int eventId);
 	}
 }
