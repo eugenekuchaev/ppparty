@@ -12,7 +12,7 @@ namespace API.DTOs
 		[Required]
 		public string? EventName { get; set; }
 
-		[StringLength(1000, MinimumLength = 3)]
+		[StringLength(1000, MinimumLength = 100)]
 		[Required]
 		public string? Description { get; set; }
 		public string? EventPhotoUrl { get; set; }

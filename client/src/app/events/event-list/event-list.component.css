@@ -5,3 +5,7 @@ a {
 .badge {
     margin-left: 5px;
 }
+
+.btn-create-event {
+    width: 100%;
+  }

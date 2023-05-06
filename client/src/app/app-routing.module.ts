@@ -16,6 +16,8 @@ import { AdminGuard } from './_guards/admin.guard';
 import { AuthGuard } from './_guards/auth.guard';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
 import { EventInvitesFromMembersComponent } from './events/event-invites-from-members/event-invites-from-members.component';
+import { CreateEventComponent } from './events/create-event/create-event.component';
+import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -33,7 +35,9 @@ const routes: Routes = [
       {path: 'messages/:username', component: MemberMessagesComponent},
       {path: 'admin', component: AdminPanelComponent, canActivate: [AdminGuard]},
       {path: 'events/:eventId', component: EventDetailComponent},
-      {path: 'events/invitefrommembers/:username', component: EventInvitesFromMembersComponent}
+      {path: 'events/invitefrommembers/:username', component: EventInvitesFromMembersComponent},
+      {path: 'createevent', component: CreateEventComponent},
+      {path: 'photoeditor', component: PhotoEditorComponent}
     ]
   },
   {path: 'errors', component: TestErrorsComponent}, 

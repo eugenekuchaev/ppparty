@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FileUploader } from 'ng2-file-upload';
 import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs';
@@ -22,11 +23,13 @@ export class PhotoEditorComponent implements OnInit {
   baseUrl = environment.apiUrl;
   user: User;
 
-  constructor(private accountService: AccountService, private toastr: ToastrService) {
+  constructor(private accountService: AccountService, private toastr: ToastrService, private router: Router) {
     this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
   }
 
   ngOnInit(): void {
+    this.appEvent = history.state.appEvent;
+    this.param = history.state.param;
     this.initializeUploader();
   }
 
@@ -87,6 +90,10 @@ export class PhotoEditorComponent implements OnInit {
         }
 
         this.toastr.success("Photo uploaded");
+
+        if (this.param === "eventphoto") {
+          this.router.navigateByUrl('/events/' + this.appEvent.id);
+        }
       }
     }
   }

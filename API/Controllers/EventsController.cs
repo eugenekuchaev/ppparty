@@ -81,7 +81,7 @@ namespace API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> CreateEvent(EventDto eventDto)
+		public async Task<ActionResult<Event>> CreateEvent(EventDto eventDto)
 		{
 			if (eventDto.EventDates!.Any(x => x.StartDate > x.EndDate))
 			{
@@ -143,7 +143,7 @@ namespace API.Controllers
 
 			if (await _eventRepository.SaveAllAsync())
 			{
-				return Ok();
+				return Ok(appEvent);
 			}
 
 			return BadRequest("Failed to create event");

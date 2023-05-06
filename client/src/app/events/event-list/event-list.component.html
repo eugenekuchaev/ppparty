@@ -66,8 +66,9 @@
                 <div *ngIf="eventNotificationsIsActivated == false && getNumberOfUnreadNotifications() === 0">
                     <a class="nav-link" (click)="clickOnEventNotifications()">Notifications</a>
                 </div>
-                <div *ngIf="eventNotificationsIsActivated == false && getNumberOfUnreadNotifications() > 0 && !hideNotificationBadges">
-                    <a class="nav-link" (click)="clickOnEventNotificationsWhenUnreadNotifications()">Notifications 
+                <div
+                    *ngIf="eventNotificationsIsActivated == false && getNumberOfUnreadNotifications() > 0 && !hideNotificationBadges">
+                    <a class="nav-link" (click)="clickOnEventNotificationsWhenUnreadNotifications()">Notifications
                         <span class="badge rounded-pill bg-warning">{{getNumberOfUnreadNotifications()}}</span>
                     </a>
                 </div>
@@ -80,7 +81,7 @@
                     <a class="nav-link dropdown-toggle" (click)="clickOnSearch()">Search</a>
                 </div>
             </li>
-            </ul>
+        </ul>
 
         <div *ngIf="searchOpen == true && allEventsIsActivated">
             <form #form="ngForm" class="row-1 mt-2" (ngSubmit)="loadAllEvents()" autocomplete="off">
@@ -95,8 +96,8 @@
                 </div>
                 <div class="col mb-2">
                     <input type="text" class="form-control ml-1" name="toDate" [(ngModel)]="eventParams.toDate"
-                    (ngModelChange)="eventParams.toDate = eventParams.toDate.toString()" placeholder="To date"
-                    type="date">
+                        (ngModelChange)="eventParams.toDate = eventParams.toDate.toString()" placeholder="To date"
+                        type="date">
                 </div>
                 <div class="col mb-2">
                     <input type="text" class="form-control ml-1" name="country" [(ngModel)]="eventParams.country"
@@ -111,8 +112,8 @@
                         placeholder="City">
                 </div>
                 <div class="col mb-3">
-                    <input type="text" class="form-control ml-1" name="eventTag"
-                        [(ngModel)]="eventParams.eventTag" placeholder="Tag">
+                    <input type="text" class="form-control ml-1" name="eventTag" [(ngModel)]="eventParams.eventTag"
+                        placeholder="Tag">
                 </div>
                 <div class="col-auto d-grid gap-2">
                     <button class="btn btn-primary" type="submit">Search</button>
@@ -120,6 +121,9 @@
                 </div>
             </form>
         </div>
+        <a routerLink="/createevent">
+            <button class="btn btn-success btn-create-event mt-3">Create event</button>
+        </a>
     </div>
 
     <div class="col">

@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="container col-6">
+        <form [formGroup]="eventCreationForm" (ngSubmit)="eventCreationForm.valid && createEvent()" autocomplete="off">
+            <h2 class="text-center text-primary">Create new event</h2>
+            <hr>
+            <app-text-input-events [formControl]='eventCreationForm.controls["eventName"]' label='Event name'>
+            </app-text-input-events>
+            <app-text-input-events [formControl]='eventCreationForm.controls["description"]' label='Description'>
+            </app-text-input-events>
+            <app-text-input-events [formControl]='eventCreationForm.controls["country"]' label='Country'>
+            </app-text-input-events>
+            <app-text-input-events [formControl]='eventCreationForm.controls["region"]' label='Region'>
+            </app-text-input-events>
+            <app-text-input-events [formControl]='eventCreationForm.controls["city"]' label='City'>
+            </app-text-input-events>
+            <app-text-input-events [formControl]='eventCreationForm.controls["address"]' label='Address'>
+            </app-text-input-events>
+            <app-text-input-events [formControl]='eventCreationForm.controls["eventTagsString"]'
+                label='Tags separated by comma'>
+            </app-text-input-events>
+            
+            <h4 class="text-center text-primary mt-4 mb-3">Dates</h4>
+            <div formArrayName="eventDates">
+                <div *ngFor="let eventDate of eventDates.controls; let i=index" [formGroupName]="i">
+                    <div class="row">
+                        <div class="col text-center">
+                            <app-text-input-events [formControlName]="'startDate'" label="Start date"></app-text-input-events>
+                        </div>
+                        <div class="col text-center">
+                            <app-text-input-events [formControlName]="'endDate'" label="End date"></app-text-input-events>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-danger" (click)="removeEventDate(i)">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mb-3">
+                <button type="button" class="btn btn-primary" (click)="addEventDate()">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+            </div>
+            
+
+            <div class="row" *ngIf="validationErrors.length > 0">
+                <ul class="text-danger">
+                    <li *ngFor="let error of validationErrors">
+                        {{error}}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="text-center mb-5">
+                <button class="btn btn-success me-2" type="submit" [disabled]='!eventCreationForm.valid' (click)="createEvent()">Create</button>
+                <button class="btn btn-secondary" type="button" routerLink="/events">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

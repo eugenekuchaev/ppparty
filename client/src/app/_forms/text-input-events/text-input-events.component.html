@@ -1,0 +1,42 @@
+<div class="mb-3 form-group">
+    <ng-container [ngSwitch]="label">
+      <input *ngSwitchDefault
+        [class.is-invalid]="ngControl.touched && ngControl.invalid"
+        type="{{type}}"
+        class="form-control"
+        [formControl]="ngControl.control"
+        placeholder="{{label}}">
+
+      <textarea *ngSwitchCase="'Description'"
+        [class.is-invalid]="ngControl.touched && ngControl.invalid"
+        class="form-control"
+        [formControl]="ngControl.control"
+        placeholder="{{label}}"
+        rows="5"></textarea>
+
+      <input *ngSwitchCase="'Start date'"
+        [class.is-invalid]="ngControl.touched && ngControl.invalid"
+        type="datetime-local"
+        class="form-control"
+        [formControl]="ngControl.control"
+        timezone="UTC">
+
+      <input *ngSwitchCase="'End date'"
+        [class.is-invalid]="ngControl.touched && ngControl.invalid"
+        type="datetime-local"
+        class="form-control"
+        [formControl]="ngControl.control"
+        timezone="UTC">
+        
+    </ng-container>
+    <div *ngIf="ngControl.control.errors?.required" class="invalid-feedback">
+      Please enter {{label}}
+    </div>
+    <div *ngIf="ngControl.control.errors?.minlength" class="invalid-feedback">
+      {{label}} must be at least {{ngControl.control.errors.minlength['requiredLength']}}
+    </div>
+    <div *ngIf="ngControl.control.errors?.maxlength" class="invalid-feedback">
+      {{label}} must be at most {{ngControl.control.errors.maxlength['requiredLength']}}
+    </div>
+  </div>
+  

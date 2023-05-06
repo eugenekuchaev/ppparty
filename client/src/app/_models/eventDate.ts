@@ -1,5 +1,5 @@
 export interface EventDate {
-  id: number
+  id?: number
   startDate: Date
   endDate: Date
 }
