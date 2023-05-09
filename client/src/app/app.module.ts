@@ -40,6 +40,7 @@ import { EventInvitesFromMembersComponent } from './events/event-invites-from-me
 import { EventInvitesFromMembersCardComponent } from './events/event-invites-from-members-card/event-invites-from-members-card.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { TextInputEventsComponent } from './_forms/text-input-events/text-input-events.component';
+import { EditEventComponent } from './events/edit-event/edit-event.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,8 @@ import { TextInputEventsComponent } from './_forms/text-input-events/text-input-
     EventInvitesFromMembersComponent,
     EventInvitesFromMembersCardComponent,
     CreateEventComponent,
-    TextInputEventsComponent
+    TextInputEventsComponent,
+    EditEventComponent
   ],
   imports: [
     BrowserModule,

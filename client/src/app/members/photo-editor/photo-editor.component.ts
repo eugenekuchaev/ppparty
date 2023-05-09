@@ -30,6 +30,11 @@ export class PhotoEditorComponent implements OnInit {
   ngOnInit(): void {
     this.appEvent = history.state.appEvent;
     this.param = history.state.param;
+    
+    if (this.member) {
+      this.param = 'userphoto';
+    }
+
     this.initializeUploader();
   }
 

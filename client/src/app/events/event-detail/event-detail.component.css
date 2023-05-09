@@ -26,11 +26,26 @@ body {
     margin-right: 10px;
 }
 
+.main-card {
+    overflow: visible;
+}
+
 .custom-card {
     max-width: 89%;
     background-color: #fafafa;
+    overflow: visible;
 }
 
 .second-button {
     margin-right: 10px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
 }

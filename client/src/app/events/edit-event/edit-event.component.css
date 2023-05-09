@@ -1,0 +1,12 @@
+a {
+    cursor: pointer;
+}
+
+.badge {
+    margin: 0 5px 10px; 
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center; 
+    align-items: center; 
+  }
+  

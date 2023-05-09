@@ -237,6 +237,7 @@ namespace API.Controllers
 						.Select(ed => (ed.StartDate, ed.EndDate)));
 
 				_mapper.Map(eventUpdateDto, appEvent);
+				appEvent.Currency = "usd";
 
 				appEvent.EventDates.Clear();
 

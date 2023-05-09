@@ -301,6 +301,7 @@ namespace API.Data
 				.Where(x => x.InvitedToEvent!.Any(x => x.UserName == username))
 				.Where(x => x.EventDates.Any(y => y.EndDate > DateTime.UtcNow))
 				.Where(x => !x.Participants.Any(y => y.UserName == username))
+				.Where(x => !x.IsCancelled)
 				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();

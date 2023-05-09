@@ -18,6 +18,7 @@ import { EventDetailComponent } from './events/event-detail/event-detail.compone
 import { EventInvitesFromMembersComponent } from './events/event-invites-from-members/event-invites-from-members.component';
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
+import { EditEventComponent } from './events/edit-event/edit-event.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -37,7 +38,8 @@ const routes: Routes = [
       {path: 'events/:eventId', component: EventDetailComponent},
       {path: 'events/invitefrommembers/:username', component: EventInvitesFromMembersComponent},
       {path: 'createevent', component: CreateEventComponent},
-      {path: 'photoeditor', component: PhotoEditorComponent}
+      {path: 'photoeditor', component: PhotoEditorComponent},
+      {path: 'editevent/:eventId', component: EditEventComponent}
     ]
   },
   {path: 'errors', component: TestErrorsComponent}, 

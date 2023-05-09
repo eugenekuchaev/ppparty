@@ -165,7 +165,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("AddedToFriendsUserId");
 
-                    b.ToTable("Friends");
+                    b.ToTable("Friends", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.AppUserRole", b =>
@@ -199,7 +199,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("GroupName");
 
-                    b.ToTable("Connections");
+                    b.ToTable("Connections", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.Event", b =>
@@ -252,7 +252,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("EventOwnerId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.EventDate", b =>
@@ -274,7 +274,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("EventDate");
+                    b.ToTable("EventDate", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.EventNotification", b =>
@@ -302,7 +302,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventNotifications");
+                    b.ToTable("EventNotifications", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.EventPhoto", b =>
@@ -326,7 +326,7 @@ namespace API.Data.Migrations
                     b.HasIndex("EventId")
                         .IsUnique();
 
-                    b.ToTable("EventPhotos");
+                    b.ToTable("EventPhotos", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.EventTag", b =>
@@ -342,7 +342,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventTags");
+                    b.ToTable("EventTags", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.Group", b =>
@@ -352,7 +352,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("GroupName");
 
-                    b.ToTable("Groups");
+                    b.ToTable("Groups", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.Message", b =>
@@ -397,7 +397,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.UserInterest", b =>
@@ -413,7 +413,7 @@ namespace API.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserInterests");
+                    b.ToTable("UserInterests", (string)null);
                 });
 
             modelBuilder.Entity("API.Entities.UserPhoto", b =>
@@ -437,7 +437,7 @@ namespace API.Data.Migrations
                     b.HasIndex("AppUserId")
                         .IsUnique();
 
-                    b.ToTable("UserPhotos");
+                    b.ToTable("UserPhotos", (string)null);
                 });
 
             modelBuilder.Entity("AppUserEvent", b =>
@@ -452,7 +452,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("ParticipateInEventsId");
 
-                    b.ToTable("AppUserEvent");
+                    b.ToTable("AppUserEvent", (string)null);
                 });
 
             modelBuilder.Entity("AppUserEvent1", b =>
@@ -467,7 +467,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("InvitedToEventsId");
 
-                    b.ToTable("AppUserEvent1");
+                    b.ToTable("AppUserEvent1", (string)null);
                 });
 
             modelBuilder.Entity("AppUserEventNotification", b =>
@@ -482,7 +482,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("RecipientsId");
 
-                    b.ToTable("AppUserEventNotification");
+                    b.ToTable("AppUserEventNotification", (string)null);
                 });
 
             modelBuilder.Entity("AppUserUserInterest", b =>
@@ -497,7 +497,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("UserInterestsId");
 
-                    b.ToTable("AppUserUserInterest");
+                    b.ToTable("AppUserUserInterest", (string)null);
                 });
 
             modelBuilder.Entity("EventEventTag", b =>
@@ -512,7 +512,7 @@ namespace API.Data.Migrations
 
                     b.HasIndex("EventsId");
 
-                    b.ToTable("EventEventTag");
+                    b.ToTable("EventEventTag", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

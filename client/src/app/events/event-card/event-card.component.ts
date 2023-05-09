@@ -88,6 +88,7 @@ export class EventCardComponent implements OnInit {
       this.eventsService.cancelEvent(appEvent.id).subscribe({
         next: () => {
           appEvent.isEnded = true;
+          appEvent.isCancelled = true;
         }
       });
     } else {

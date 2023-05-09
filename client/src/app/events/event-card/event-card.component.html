@@ -117,12 +117,42 @@
                 </div>
                 <div 
                     class="position-absolute bottom-0 end-0 mb-3 me-3" 
-                    *ngIf="showButtonsInOwned && appEvent.isEnded === false">
+                    *ngIf="checkIfEventIsInParticipated(appEvent) && appEvent.isEnded === true && appEvent.isCancelled === false">
                         <button 
-                            class="btn btn-success second-button" 
-                            type="button">
-                                Edit
+                            class="btn btn-dark disabled" 
+                            type="button" 
+                            (click)="stopParticipatingInEvent(appEvent)">
+                                Ended
                         </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="checkIfEventIsInParticipated(appEvent) && appEvent.isEnded === true && appEvent.isCancelled === true">
+                        <button 
+                            class="btn btn-dark disabled" 
+                            type="button" 
+                            (click)="stopParticipatingInEvent(appEvent)">
+                                Cancelled
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInOwned && appEvent.isEnded === false && appEvent.isCancelled === false">
+                    <div class="btn-group" role="group">
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle second-button" type="button" id="dropdownMenuButton">
+                                Edit
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" routerLink="/editevent/{{appEvent.id}}">Edit event</a>
+                                <a class="dropdown-item" 
+                                    [routerLink]="['/photoeditor']" 
+                                    [state]="{appEvent: appEvent, param: 'eventphoto'}">
+                                        Change photo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                         <button 
                             class="btn btn-danger" 
                             type="button" 
@@ -132,11 +162,21 @@
                 </div>
                 <div 
                     class="position-absolute bottom-0 end-0 mb-3 me-3" 
-                    *ngIf="showButtonsInOwned && appEvent.isEnded === true">
+                    *ngIf="showButtonsInOwned && appEvent.isEnded === true && appEvent.isCancelled === true">
                         <button 
                             class="btn btn-success" 
-                            type="button">
+                            type="button"
+                            routerLink="/editevent/{{appEvent.id}}">
                                 Edit
+                        </button>
+                </div>
+                <div 
+                    class="position-absolute bottom-0 end-0 mb-3 me-3" 
+                    *ngIf="showButtonsInOwned && appEvent.isEnded === true && appEvent.isCancelled === false">
+                        <button 
+                            class="btn btn-dark disabled"  
+                            type="button">
+                                Ended
                         </button>
                 </div>
             </div>

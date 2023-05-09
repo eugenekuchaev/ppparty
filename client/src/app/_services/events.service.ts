@@ -109,11 +109,11 @@ export class EventsService {
 
   addTags(tags: string, eventId: Number) {
     const options = { headers: { 'Content-Type': 'application/json' } };
-    return this.http.post(this.baseUrl + 'events/addtags' + eventId, JSON.stringify(tags), options);
+    return this.http.post(this.baseUrl + 'events/addtags/' + eventId, JSON.stringify(tags), options);
   }
 
   deleteTag(tag: string, eventId: Number) {
-    return this.http.delete(this.baseUrl + 'events/deletetag/' + eventId, { params: { eventTagName: tag } });
+    return this.http.delete(this.baseUrl + 'events/deletetag/' + eventId, { params: { tagName: tag } });
   }
 
   deleteEvent(eventId: Number) {

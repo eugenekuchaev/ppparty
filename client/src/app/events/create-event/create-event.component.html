@@ -1,7 +1,7 @@
 <div class="row">
     <div class="container col-6">
         <form [formGroup]="eventCreationForm" (ngSubmit)="eventCreationForm.valid && createEvent()" autocomplete="off">
-            <h2 class="text-center text-primary">Create new event</h2>
+            <h2 class="text-center">Create new event</h2>
             <hr>
             <app-text-input-events [formControl]='eventCreationForm.controls["eventName"]' label='Event name'>
             </app-text-input-events>
@@ -19,7 +19,7 @@
                 label='Tags separated by comma'>
             </app-text-input-events>
             
-            <h4 class="text-center text-primary mt-4 mb-3">Dates</h4>
+            <h4 class="text-center mt-4 mb-3">Dates</h4>
             <div formArrayName="eventDates">
                 <div *ngFor="let eventDate of eventDates.controls; let i=index" [formGroupName]="i">
                     <div class="row">
@@ -54,7 +54,7 @@
             </div>
 
             <div class="text-center mb-5">
-                <button class="btn btn-success me-2" type="submit" [disabled]='!eventCreationForm.valid' (click)="createEvent()">Create</button>
+                <button class="btn btn-success me-2" type="submit" [disabled]='!eventCreationForm.valid'>Create</button>
                 <button class="btn btn-secondary" type="button" routerLink="/events">Cancel</button>
             </div>
         </form>
