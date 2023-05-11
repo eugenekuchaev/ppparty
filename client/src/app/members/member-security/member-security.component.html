@@ -2,48 +2,47 @@
     <div class="col-4"></div>
     <div class="text-center col-4">
         <h4 class="mb-3">Change email</h4>
-        <form #editEmail="ngForm" (ngSubmit)="updateEmail()" class="mb-5">
+        <form [formGroup]="editEmailForm" (ngSubmit)="editEmailForm.valid && updateEmail()" autocomplete="off" class="mb-5">
             <div class="mb-3">
-                <input 
-                    [(ngModel)]="member.email"
+                <app-text-input 
+                    [formControl]='editEmailForm.controls["email"]'
                     type="email" 
                     name="email" 
-                    class="form-control" 
-                    placeholder="Email address"
                     autocomplete="off">
+                </app-text-input>
             </div>
-            <button [disabled]="!editEmail.dirty" type="submit" class="btn btn-success">Save changes</button>
+            <button [disabled]="!editEmailForm.dirty" type="submit" class="btn btn-success">Save changes</button>
         </form>
         <h4 class="mb-3">Change password</h4>
-        <form #editPassword="ngForm" (ngSubmit)="updatePassword()" class="mb-5">
+        <form [formGroup]="changePasswordForm" (ngSubmit)="changePasswordForm.valid && changePassword()" class="mb-5">
             <div class="mb-3">
-                <input 
+                <app-text-input
+                    [formControl]='changePasswordForm.controls["oldPassword"]'
                     type="password" 
-                    name="oldpassword" 
-                    class="form-control" 
-                    placeholder="Current password"
-                    autocomplete="off"
-                    ngModel>
+                    name="oldPassword" 
+                    label='Current password'
+                    autocomplete="off">
+                </app-text-input>
             </div>
             <div class="mb-3">
-                <input 
+                <app-text-input
+                    [formControl]='changePasswordForm.controls["newPassword"]'
                     type="password" 
-                    name="newpassword" 
-                    class="form-control" 
-                    placeholder="New password"
-                    autocomplete="off"
-                    ngModel>
+                    name="newPassword" 
+                    label='New password'
+                    autocomplete="off">
+                </app-text-input>
             </div>
             <div class="mb-3">
-                <input 
+                <app-text-input
+                    [formControl]='changePasswordForm.controls["confirmNewPassword"]'
                     type="password" 
-                    name="confirmnewpassword" 
-                    class="form-control" 
-                    placeholder="Confirm new password"
-                    autocomplete="off" 
-                    ngModel>
+                    name="confirmNewPassword" 
+                    label='Confirm new password'
+                    autocomplete="off">
+                </app-text-input>
             </div>
-            <button [disabled]="!editPassword.dirty" type="submit" class="btn btn-success">Save changes</button>
+            <button [disabled]="!changePasswordForm.dirty || !changePasswordForm.valid" type="submit" class="btn btn-success">Save changes</button>
         </form>
     </div>
 </div>

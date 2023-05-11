@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, NgForm, ValidatorFn, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs';
 import { Member } from 'src/app/_models/member';
@@ -15,11 +16,16 @@ import { MembersService } from 'src/app/_services/members.service';
 export class MemberSecurityComponent {
   @ViewChild('editEmail') editEmail: NgForm;
   @ViewChild('editPassword') editPassword: NgForm;
+  editEmailForm: FormGroup;
+  emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,7}$';
+  emailValidationErrors: string[] = [];
+  changePasswordForm: FormGroup;
+  passwordValidationErrors: string[] = [];
   member: Member;
   user: User;
 
   constructor(private memberService: MembersService, private accountService: AccountService,
-    private toastr: ToastrService) {
+    private toastr: ToastrService, private fb: FormBuilder, private router: Router) {
     this.accountService.currentUser$.pipe(take(1)).subscribe({
       next: user => this.user = user
     })
@@ -27,23 +33,65 @@ export class MemberSecurityComponent {
 
   ngOnInit(): void {
     this.loadMember();
+    this.initializePasswordForm();
+  }
+  
+  initializePasswordForm() {
+    this.changePasswordForm = this.fb.group({
+      oldPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(64)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(64)]],
+      confirmNewPassword: ['', [Validators.required, this.matchValues('newPassword')]]
+    })
+    this.changePasswordForm.controls.newPassword.valueChanges.subscribe({
+      next: () => {
+        this.changePasswordForm.controls.confirmNewPassword.updateValueAndValidity();
+      }
+    })
   }
 
   loadMember() {
     this.memberService.getMember(this.user.username).subscribe({
-      next: member => this.member = member
+      next: member => {
+        this.member = member;
+        this.editEmailForm = this.fb.group({
+          email: [this.member.email, [Validators.required, Validators.pattern(this.emailPattern)]]
+        });
+      }
+    });
+  }
+  
+
+  updateEmail() {
+    this.accountService.updateEmail(this.editEmailForm.value).subscribe({
+      next: response => {
+        this.toastr.success("Email updated");
+      },
+      error: error => {
+        this.emailValidationErrors = error;
+      }
     })
   }
 
-  updateEmail() {
-    console.log(this.member);
-    this.toastr.success('Email updated');
-    this.editEmail.reset(this.member);
+  changePassword() {
+    this.accountService.changePassword(this.changePasswordForm.value).subscribe({
+      next: response => {
+        this.toastr.success("Password updated");
+        this.logout();
+      },
+      error: error => {
+        this.emailValidationErrors = error;
+      }
+    })
   }
 
-  updatePassword() {
-    console.log(this.member);
-    this.toastr.success('Password updated');
-    this.editPassword.reset(this.member);
+  logout() {
+    this.accountService.logout();
+    this.router.navigateByUrl('/');
+  }
+
+  matchValues(matchTo: string): ValidatorFn {
+    return (control: AbstractControl) => {
+      return control?.value === control?.parent?.controls[matchTo].value ? null : { isMatching: true }
+    }
   }
 }

@@ -38,6 +38,14 @@ export class AccountService {
     )
   }
 
+  updateEmail(model: any) {
+    return this.http.put(this.baseUrl + 'account/changeemail', model);
+  }
+
+  changePassword(model: any) {
+    return this.http.put(this.baseUrl + 'account/changepassword', model);
+  }
+
   setCurrentUser(user: User) {
     user.roles = [];
     const roles = this.getDecodedToken(user.token).role;

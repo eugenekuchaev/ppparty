@@ -2,9 +2,9 @@ namespace API.DTOs
 {
 	public class UserDto
 	{
-		public string Username { get; set; } = null!;
-		public string Token { get; set; } = null!;
-		public string PhotoUrl { get; set; } = null!; 
-		public string FullName { get; set; } = null!;
+		public string? Username { get; set; } 
+		public string? Token { get; set; }
+		public string? PhotoUrl { get; set; }  
+		public string? FullName { get; set; } 
 	}
 }

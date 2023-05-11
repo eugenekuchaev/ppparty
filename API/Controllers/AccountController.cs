@@ -2,6 +2,7 @@ using API.DTOs;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,16 +17,18 @@ namespace API.Controllers
 		private readonly UserManager<AppUser> _userManager;
 		private readonly ITokenService _tokenService;
 		private readonly IMapper _mapper;
-		
-		public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, 
-			ITokenService tokenService, IMapper mapper)
+		private readonly IUserRepository _userRepository;
+
+		public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
+			ITokenService tokenService, IMapper mapper, IUserRepository userRepository)
 		{
+			_userRepository = userRepository;
 			_userManager = userManager;
 			_signInManager = signInManager;
 			_tokenService = tokenService;
 			_mapper = mapper;
 		}
-		
+
 		[HttpPost("register")]
 		public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
 		{
@@ -33,30 +36,30 @@ namespace API.Controllers
 			{
 				return BadRequest("Username is taken");
 			}
-			
+
 			var user = _mapper.Map<AppUser>(registerDto);
-			
+
 			user.UserName = registerDto.Username.ToLower();
-			
-			user.UserPhoto = new UserPhoto 
+
+			user.UserPhoto = new UserPhoto
 			{
 				PhotoUrl = "https://res.cloudinary.com/duy1fjz1z/image/upload/v1678110186/user_epf5zu.png"
 			};
-			
+
 			var result = await _userManager.CreateAsync(user, registerDto.Password);
-			
+
 			if (!result.Succeeded)
 			{
 				return BadRequest(result.Errors);
 			}
-			
+
 			var roleResult = await _userManager.AddToRoleAsync(user, "Member");
-			
+
 			if (!roleResult.Succeeded)
 			{
 				return BadRequest(result.Errors);
 			}
-			
+
 			return new UserDto
 			{
 				Username = user.UserName,
@@ -65,26 +68,26 @@ namespace API.Controllers
 				FullName = user.FullName
 			};
 		}
-		
+
 		[HttpPost("login")]
 		public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
 		{
 			var user = await _userManager.Users
 				.Include(p => p.UserPhoto)
 				.SingleOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
-			
+
 			if (user == null)
 			{
-				return Unauthorized("Invalid username");
+				return Unauthorized();
 			}
-			
+
 			var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-			
+
 			if (!result.Succeeded)
 			{
 				return Unauthorized();
 			}
-			
+
 			return new UserDto
 			{
 				Username = user.UserName,
@@ -93,7 +96,59 @@ namespace API.Controllers
 				FullName = user.FullName
 			};
 		}
+
+		[Authorize]
+		[HttpPut("changeemail")]
+		public async Task<ActionResult> ChangeEmail(ChangeEmailDto changeEmailDto)
+		{
+			var user = await _userManager.FindByNameAsync(User.Identity!.Name);
+
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			user.Email = changeEmailDto.Email;
+
+			var result = await _userManager.UpdateAsync(user);
+
+			if (!result.Succeeded)
+			{
+				return BadRequest(result.Errors);
+			}
+
+			return Ok();
+		}
 		
+		[Authorize]
+		[HttpPut("changepassword")]
+		public async Task<ActionResult<UserDto>> ChangePassword(ChangePasswordDto changePasswordDto)
+		{
+			if (changePasswordDto.NewPassword != changePasswordDto.ConfirmNewPassword) 
+			{
+				return BadRequest("Passwords don't match");
+			}
+			
+			var user = await _userManager.FindByNameAsync(User.Identity!.Name);
+
+			if (user == null)
+			{
+				return Unauthorized();
+			}
+
+			var result = await _userManager.ChangePasswordAsync(user, changePasswordDto.OldPassword, changePasswordDto.NewPassword);
+
+			if (!result.Succeeded)
+			{
+				return BadRequest("Wrong password");
+			}
+
+			return new UserDto
+			{
+				Token = await _tokenService.CreateToken(user)
+			};
+		}
+
 		private async Task<bool> UserExists(string username)
 		{
 			return await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());
