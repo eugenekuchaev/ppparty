@@ -7,26 +7,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [ApiController]
+	[ApiController]
 	[Route("api/[controller]")]
 	[Authorize]
 	public class FriendsController : ControllerBase
 	{
-		private readonly IUserRepository _userRepository;
-		private readonly IFriendsRepository _friendsRepository;
+		private readonly IUnitOfWork _unitOfWork;
 		
-		public FriendsController(IUserRepository userRepository, IFriendsRepository friendsRepository)
+		public FriendsController(IUnitOfWork unitOfWork)
 		{
-			_userRepository = userRepository;
-			_friendsRepository = friendsRepository;
+			_unitOfWork = unitOfWork;
 		}
 		
 		[HttpPost("{username}")]
 		public async Task<ActionResult> AddFriend(string username)
 		{
 			var addingToFriendsUserId = User.GetUserId();
-			var addedToFriendsUser = await _userRepository.GetUserByUsernameAsync(username);
-			var addingToFriendsUser = await _friendsRepository.GetUserWithFriends(addingToFriendsUserId);
+			var addedToFriendsUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+			var addingToFriendsUser = await _unitOfWork.FriendsRepository.GetUserWithFriends(addingToFriendsUserId);
 			
 			if (addedToFriendsUser == null)
 			{
@@ -38,7 +36,7 @@ namespace API.Controllers
 				return BadRequest("You can't add yourself to friends");
 			}
 			
-			var userFriend = await _friendsRepository.GetUserFriend(addingToFriendsUserId, addedToFriendsUser.Id);
+			var userFriend = await _unitOfWork.FriendsRepository.GetUserFriend(addingToFriendsUserId, addedToFriendsUser.Id);
 			
 			if (userFriend != null) 
 			{
@@ -53,7 +51,7 @@ namespace API.Controllers
 			
 			addingToFriendsUser.AddedToFriendsUsers!.Add(userFriend);
 			
-			if (await _userRepository.SaveAllAsync()) 
+			if (await _unitOfWork.Complete()) 
 			{
 				return Ok();
 			}
@@ -65,8 +63,8 @@ namespace API.Controllers
 		public async Task<ActionResult> DeleteFriend(string username)
 		{
 			var addingToFriendsUserId = User.GetUserId();
-			var addedToFriendsUser = await _userRepository.GetUserByUsernameAsync(username);
-			var addingToFriendsUser = await _friendsRepository.GetUserWithFriends(addingToFriendsUserId);
+			var addedToFriendsUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+			var addingToFriendsUser = await _unitOfWork.FriendsRepository.GetUserWithFriends(addingToFriendsUserId);
 			
 			if (addedToFriendsUser == null)
 			{
@@ -78,7 +76,7 @@ namespace API.Controllers
 				return BadRequest("You can't delete yourself from friends");
 			}
 			
-			var userFriend = await _friendsRepository.GetUserFriend(addingToFriendsUserId, addedToFriendsUser.Id);
+			var userFriend = await _unitOfWork.FriendsRepository.GetUserFriend(addingToFriendsUserId, addedToFriendsUser.Id);
 			
 			if (userFriend == null) 
 			{
@@ -87,7 +85,7 @@ namespace API.Controllers
 			
 			addingToFriendsUser.AddedToFriendsUsers!.Remove(userFriend);
 			
-			if (await _userRepository.SaveAllAsync()) 
+			if (await _unitOfWork.Complete()) 
 			{
 				return Ok();
 			}
@@ -103,7 +101,7 @@ namespace API.Controllers
 				return BadRequest("This predicate is undefined");
 			}
 			
-			var users = await _friendsRepository.GetFriends(predicate, User.GetUserId());
+			var users = await _unitOfWork.FriendsRepository.GetFriends(predicate, User.GetUserId());
 			
 			return Ok(users);
 		}

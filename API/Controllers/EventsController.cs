@@ -14,28 +14,23 @@ namespace API.Controllers
 	[Authorize]
 	public class EventsController : ControllerBase
 	{
-		private readonly IEventRepository _eventRepository;
 		private readonly IPhotoService _photoService;
-		private readonly IUserRepository _userRepository;
 		private readonly IMapper _mapper;
 		private readonly InputProcessor _inputProcessor;
-		private readonly IFriendsRepository _friendsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-		public EventsController(IEventRepository eventRepository, IPhotoService photoService, IUserRepository userRepository,
-			IMapper mapper, InputProcessor inputProcessor, IFriendsRepository friendsRepository)
+		public EventsController(IUnitOfWork unitOfWork, IPhotoService photoService, IMapper mapper, InputProcessor inputProcessor)
 		{
-			_friendsRepository = friendsRepository;
+            _unitOfWork = unitOfWork;
 			_inputProcessor = inputProcessor;
 			_mapper = mapper;
-			_userRepository = userRepository;
 			_photoService = photoService;
-			_eventRepository = eventRepository;
 		}
 
 		[HttpGet("allevents")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetAllEvents([FromQuery] EventParams eventParams)
 		{
-			var events = await _eventRepository.GetAllEventsAsync(eventParams);
+			var events = await _unitOfWork.EventRepository.GetAllEventsAsync(eventParams);
 
 			Response.AddPaginationHeader(events.CurrentPage, events.PageSize, events.TotalCount, events.TotalPages);
 
@@ -45,32 +40,32 @@ namespace API.Controllers
 		[HttpGet("ownedevents")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetOwnedEvents()
 		{
-			return Ok(await _eventRepository.GetOwnedEventsAsync(User.GetUsername()));
+			return Ok(await _unitOfWork.EventRepository.GetOwnedEventsAsync(User.GetUsername()));
 		}
 
 		[HttpGet("participatedevents")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetParticipatedEvents()
 		{
-			return Ok(await _eventRepository.GetParticipatedEventsAsync(User.GetUsername()));
+			return Ok(await _unitOfWork.EventRepository.GetParticipatedEventsAsync(User.GetUsername()));
 		}
 
 		[HttpGet("friendsevents")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetFriendsEvents()
 		{
-			return Ok(await _eventRepository.GetFriendsEventsAsync(User.GetUsername()));
+			return Ok(await _unitOfWork.EventRepository.GetFriendsEventsAsync(User.GetUsername()));
 		}
 
 		[HttpGet("recommendedevents")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetRecommendedEvents()
 		{
-			return Ok(await _eventRepository.GetRecommendedEventsAsync(User.GetUsername()));
+			return Ok(await _unitOfWork.EventRepository.GetRecommendedEventsAsync(User.GetUsername()));
 		}
 
 		[HttpGet("{eventId}", Name = "GetEvent")]
 		public async Task<ActionResult<FullEventDto>> GetEvent(int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var appEvent = await _unitOfWork.EventRepository.GetEventAsync(eventId, user!.Id);
 
 			if (appEvent != null)
 			{
@@ -93,7 +88,7 @@ namespace API.Controllers
 				return BadRequest("Start date and end date cannot differ for more than one day");
 			}
 			
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = _mapper.Map<Event>(eventDto);
 			string tags = eventDto.EventTagsString!;
 
@@ -117,7 +112,7 @@ namespace API.Controllers
 					return BadRequest("There's already one of these tags in this event");
 				}
 
-				var eventTagFromDb = await _eventRepository.GetEventTagByNameAsync(eventTag);
+				var eventTagFromDb = await _unitOfWork.EventRepository.GetEventTagByNameAsync(eventTag);
 
 				if (eventTagFromDb != null)
 				{
@@ -139,9 +134,9 @@ namespace API.Controllers
 			appEvent.Participants.Add(user!);
 			appEvent.Currency = "usd";
 
-			_eventRepository.AddEvent(appEvent);
+			_unitOfWork.EventRepository.AddEvent(appEvent);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok(appEvent);
 			}
@@ -152,9 +147,9 @@ namespace API.Controllers
 		[HttpPut("participateinevent/{eventId}")]
 		public async Task<ActionResult> ParticipateInEvent(int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
-			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+			var appEvent = await _unitOfWork.EventRepository.GetEventAsync(eventId, user!.Id);
 
 			if (appEvent == null)
 			{
@@ -166,9 +161,9 @@ namespace API.Controllers
 				return BadRequest("You're already participating in this event");
 			}
 
-			await _eventRepository.AddUserToEventParticipantsAsync(eventId, user!.UserName);
+			await _unitOfWork.EventRepository.AddUserToEventParticipantsAsync(eventId, user!.UserName);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok();
 			}
@@ -179,9 +174,9 @@ namespace API.Controllers
 		[HttpDelete("stopparticipatinginevent/{eventId}")]
 		public async Task<ActionResult> StopParticipatingInEvent(int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
-			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+			var appEvent = await _unitOfWork.EventRepository.GetEventAsync(eventId, user!.Id);
 
 			if (appEvent == null)
 			{
@@ -193,9 +188,9 @@ namespace API.Controllers
 				return BadRequest("You can't stop participating in your own event");
 			}
 
-			await _eventRepository.RemoveUserFromEventParticipantsAsync(eventId, user!.UserName);
+			await _unitOfWork.EventRepository.RemoveUserFromEventParticipantsAsync(eventId, user!.UserName);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok();
 			}
@@ -216,8 +211,8 @@ namespace API.Controllers
 				return BadRequest("Start date and end date cannot differ for more than one day");
 			}
 			
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
@@ -255,7 +250,7 @@ namespace API.Controllers
 							EventName = appEvent.EventName!
 						};
 
-						await _eventRepository.NotifyEventParticipant(participant.Id, notification);
+						await _unitOfWork.EventRepository.NotifyEventParticipant(participant.Id, notification);
 					}
 				}
 			}
@@ -264,9 +259,9 @@ namespace API.Controllers
 				return BadRequest("You have to add event dates");
 			}
 
-			_eventRepository.UpdateEvent(appEvent);
+			_unitOfWork.EventRepository.UpdateEvent(appEvent);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -282,8 +277,8 @@ namespace API.Controllers
 				return BadRequest("You need to add tags");
 			}
 
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
@@ -309,7 +304,7 @@ namespace API.Controllers
 					return BadRequest("There's already one of these tags in this event");
 				}
 
-				var eventTagFromDb = await _eventRepository.GetEventTagByNameAsync(eventTag);
+				var eventTagFromDb = await _unitOfWork.EventRepository.GetEventTagByNameAsync(eventTag);
 
 				if (eventTagFromDb != null)
 				{
@@ -321,7 +316,7 @@ namespace API.Controllers
 				}
 			}
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -332,8 +327,8 @@ namespace API.Controllers
 		[HttpDelete("deletetag/{eventId}")]
 		public async Task<ActionResult> DeleteTag(string tagName, int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
@@ -354,7 +349,7 @@ namespace API.Controllers
 
 			appEvent.EventTags.Remove(eventTag);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -365,8 +360,8 @@ namespace API.Controllers
 		[HttpPost("add-photo/{eventId}")]
 		public async Task<ActionResult<EventPhotoDto>> AddPhoto(IFormFile file, int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
@@ -392,9 +387,9 @@ namespace API.Controllers
 				Event = appEvent
 			};
 
-			_eventRepository.AddPhoto(photo);
+			_unitOfWork.EventRepository.AddPhoto(photo);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return CreatedAtRoute("GetEvent", new { eventId = appEvent.Id }, _mapper.Map<EventPhotoDto>(photo));
 			}
@@ -405,8 +400,8 @@ namespace API.Controllers
 		[HttpDelete("deleteevent/{eventId}")]
 		public async Task<ActionResult> DeleteEvent(int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
@@ -418,9 +413,9 @@ namespace API.Controllers
 				return BadRequest("You are not the owner of this event");
 			}
 
-			_eventRepository.DeleteEvent(appEvent);
+			_unitOfWork.EventRepository.DeleteEvent(appEvent);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -431,20 +426,20 @@ namespace API.Controllers
 		[HttpPut("invitetoevent/{eventId}")]
 		public async Task<ActionResult> InviteToEvent(string username, int eventId)
 		{
-			var sender = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-			var recipient = await _userRepository.GetUserByUsernameAsync(username);
+			var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+			var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
 			if (recipient == null)
 			{
 				return BadRequest("There's no such a user");
 			}
 
-			if (!await _friendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
+			if (!await _unitOfWork.FriendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
 			{
 				return BadRequest("You are not friends with this user");
 			}
 
-			var appEvent = await _eventRepository.GetEventEntityAsync(eventId);
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
@@ -456,11 +451,11 @@ namespace API.Controllers
 				return BadRequest("This user is already participating in this event");
 			}
 
-			var user = await _userRepository.GetUserByUsernameAsync(username);
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
-			await _eventRepository.AddUserToInvitedToEventAsync(eventId, user!.UserName);
+			await _unitOfWork.EventRepository.AddUserToInvitedToEventAsync(eventId, user!.UserName);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok();
 			}
@@ -471,17 +466,17 @@ namespace API.Controllers
 		[HttpGet("invites")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetInvites()
 		{
-			return Ok(await _eventRepository.GetInvitesAsync(User.GetUsername()));
+			return Ok(await _unitOfWork.EventRepository.GetInvitesAsync(User.GetUsername()));
 		}
 
 		[HttpDelete("declineinvitation/{eventId}")]
 		public async Task<ActionResult> DeclineInvitation(int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
-			await _eventRepository.RemoveUserFromEventInvitationsAsync(eventId, user!.UserName);
+			await _unitOfWork.EventRepository.RemoveUserFromEventInvitationsAsync(eventId, user!.UserName);
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok();
 			}
@@ -492,9 +487,9 @@ namespace API.Controllers
 		[HttpPut("cancelevent/{eventId}")]
 		public async Task<ActionResult> CancelEvent(int eventId)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
-			var appEvent = await _eventRepository.GetEventAsync(eventId, user!.Id);
+			var appEvent = await _unitOfWork.EventRepository.GetEventAsync(eventId, user!.Id);
 
 			if (appEvent == null)
 			{
@@ -511,7 +506,7 @@ namespace API.Controllers
 				return BadRequest("This event has already been cancelled");
 			}
 
-			await _eventRepository.CancelEvent(eventId);
+			await _unitOfWork.EventRepository.CancelEvent(eventId);
 
 			foreach (var participant in appEvent.Participants!)
 			{
@@ -522,10 +517,10 @@ namespace API.Controllers
 					EventName = appEvent.EventName!
 				};
 
-				await _eventRepository.NotifyEventParticipant(participant.Id, notification);
+				await _unitOfWork.EventRepository.NotifyEventParticipant(participant.Id, notification);
 			}
 
-			if (await _eventRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok();
 			}
@@ -536,33 +531,33 @@ namespace API.Controllers
 		[HttpGet("eventnotifications")]
 		public async Task<ActionResult<IEnumerable<EventNotification>>> GetEventNotifications()
 		{
-			return Ok(await _eventRepository.GetEventNotificationsAsync(User.GetUsername()));
+			return Ok(await _unitOfWork.EventRepository.GetEventNotificationsAsync(User.GetUsername()));
 		}
 
 		[HttpPut("readeventnotification/{notificationId}")]
 		public async Task<ActionResult> ReadEventNotification(int notificationId)
 		{
-			await _eventRepository.ReadEventNotification(notificationId);
-			await _eventRepository.SaveAllAsync();
+			await _unitOfWork.EventRepository.ReadEventNotification(notificationId);
+			await _unitOfWork.Complete();
 			return Ok();
 		}
 		
 		[HttpGet("numberofownedevents/{username}")]
 		public async Task<ActionResult<int>> GetNumberOfOwnedEvents(string username)
 		{
-			return await _eventRepository.GetNumberOfOwnedEvents(username);
+			return await _unitOfWork.EventRepository.GetNumberOfOwnedEvents(username);
 		}
 		
 		[HttpGet("eventsforinvitations")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetEventsForInvitations(string friendUsername)
 		{
-			return Ok(await _eventRepository.GetActualParticipatedAndOwnedEvents(User.GetUsername(), friendUsername));
+			return Ok(await _unitOfWork.EventRepository.GetActualParticipatedAndOwnedEvents(User.GetUsername(), friendUsername));
 		}
 		
 		[HttpGet("hasuserbeeninvitedtoevent")]
 		public ActionResult<bool> CheckIfUserHasBeenInvited(string username, int eventId)
 		{
-			return Ok(_eventRepository.CheckIfUserHasBeenInvited(username, eventId));
+			return Ok(_unitOfWork.EventRepository.CheckIfUserHasBeenInvited(username, eventId));
 		}
 	}
 }

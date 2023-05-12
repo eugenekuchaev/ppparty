@@ -15,7 +15,6 @@ namespace API.Interfaces
 		Task<IEnumerable<EventDto>> GetFriendsEventsAsync(string username);
 		Task<FullEventDto?> GetEventAsync(int id, int userId);
 		Task<Event?> GetEventEntityAsync(int eventId);
-		Task<bool> SaveAllAsync();
 		void AddPhoto(EventPhoto photo);
 		void UpdateEvent(Event appEvent);
 		Task<EventTag?> GetEventTagByNameAsync(string interestName);

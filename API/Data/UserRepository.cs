@@ -13,11 +13,9 @@ namespace API.Data
 	{
 		private readonly DataContext _context;
 		private readonly IMapper _mapper;
-		private readonly UserManager<AppUser> _userManager;
 
-		public UserRepository(DataContext context, IMapper mapper, UserManager<AppUser> userManager)
+		public UserRepository(DataContext context, IMapper mapper)
 		{
-			_userManager = userManager;	
 			_mapper = mapper;
 			_context = context;
 		}
@@ -86,11 +84,6 @@ namespace API.Data
 		public async Task<UserInterest?> GetUserInterestByNameAsync(string interestName)
 		{
 			return await _context.UserInterests.SingleOrDefaultAsync(x => x.InterestName == interestName);
-		}
-
-		public async Task<bool> SaveAllAsync()
-		{
-			return await _context.SaveChangesAsync() > 0;
 		}
 
 		public void UpdateUser(AppUser user)

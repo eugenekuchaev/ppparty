@@ -14,15 +14,13 @@ namespace API.Controllers
 	[Authorize]
 	public class MessagesController : ControllerBase
 	{
-		private readonly IUserRepository _userRepository;
-		private readonly IMessageRepository _messageRepository;
 		private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 		
-		public MessagesController(IUserRepository userRepository, IMessageRepository messageRepository, IMapper mapper)
+		public MessagesController(IMapper mapper, IUnitOfWork unitOfWork)
 		{
+            _unitOfWork = unitOfWork;
 			_mapper = mapper;
-			_userRepository = userRepository;
-			_messageRepository = messageRepository;
 		}
 		
 		[HttpPost]
@@ -35,8 +33,8 @@ namespace API.Controllers
 				return BadRequest("You cannot send messages to yourself");
 			}
 			
-			var sender = await _userRepository.GetUserByUsernameAsync(username);
-			var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername!);
+			var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+			var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername!);
 			
 			if (recipient == null) 
 			{
@@ -52,9 +50,9 @@ namespace API.Controllers
 				Content = createMessageDto.Content
 			};
 			
-			_messageRepository.AddMessage(message);
+			_unitOfWork.MessageRepository.AddMessage(message);
 			
-			if (await _messageRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return Ok(_mapper.Map<MessageDto>(message));
 			}
@@ -65,7 +63,7 @@ namespace API.Controllers
 		[HttpGet("conversations")]
 		public async Task<ActionResult<IEnumerable<ConversationDto>>> GetConverstions()
 		{
-			return Ok(await _messageRepository.GetConversations(User.GetUsername()));
+			return Ok(await _unitOfWork.MessageRepository.GetConversations(User.GetUsername()));
 		}
 		
 		[HttpGet("thread/{username}")]
@@ -74,7 +72,7 @@ namespace API.Controllers
 		{
 			var currentUsername = User.GetUsername();
 			
-			var thread = await _messageRepository.GetMessageThread(userParams, currentUsername, username);
+			var thread = await _unitOfWork.MessageRepository.GetMessageThread(userParams, currentUsername, username);
 			
 			Response.AddPaginationHeader(thread.CurrentPage, thread.PageSize, thread.TotalCount, thread.TotalPages);
 			

@@ -14,29 +14,29 @@ namespace API.Controllers
 	[Authorize]
 	public class UsersController : ControllerBase
 	{
-		private readonly IUserRepository _userRepository;
 		private readonly IMapper _mapper;
 		private readonly IPhotoService _photoService;
 		private readonly LinkTransformer _linkTransformer;
 		private readonly InputProcessor _inputProcessor;
+        private readonly IUnitOfWork _unitOfWork;
 
-		public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService,
+		public UsersController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService,
 			LinkTransformer linkTransformer, InputProcessor inputProcessor)
 		{
+            _unitOfWork = unitOfWork;
 			_inputProcessor = inputProcessor;
 			_linkTransformer = linkTransformer;
 			_photoService = photoService;
 			_mapper = mapper;
-			_userRepository = userRepository;
 		}
 
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 			userParams.CurrentUsername = user!.UserName;
 
-			var users = await _userRepository.GetMembersAsync(userParams);
+			var users = await _unitOfWork.UserRepository.GetMembersAsync(userParams);
 
 			Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
 
@@ -46,13 +46,13 @@ namespace API.Controllers
 		[HttpGet("{username}", Name = "GetUser")]
 		public async Task<ActionResult<MemberDto?>> GetUser(string username)
 		{
-			return await _userRepository.GetMemberAsync(username);
+			return await _unitOfWork.UserRepository.GetMemberAsync(username);
 		}
 
 		[HttpPut("updatename")]
 		public async Task<ActionResult> UpdateName(NameUpdateDto nameUpdateDto)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			var trimmedNameUpdateDto = new NameUpdateDto
 			{
@@ -61,9 +61,9 @@ namespace API.Controllers
 
 			_mapper.Map(trimmedNameUpdateDto, user);
 
-			_userRepository.UpdateUser(user!);
+			_unitOfWork.UserRepository.UpdateUser(user!);
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -74,7 +74,7 @@ namespace API.Controllers
 		[HttpPut("updatelocation")]
 		public async Task<ActionResult> UpdateLocation(LocationUpdateDto locationUpdateDto)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			if (locationUpdateDto.City == "" || locationUpdateDto.City == null)
 			{
@@ -90,9 +90,9 @@ namespace API.Controllers
 
 			_mapper.Map(trimmedLocationUpdateDto, user);
 
-			_userRepository.UpdateUser(user!);
+			_unitOfWork.UserRepository.UpdateUser(user!);
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -103,7 +103,7 @@ namespace API.Controllers
 		[HttpPut("updateAbout")]
 		public async Task<ActionResult> UpdateAbout(AboutUpdateDto aboutUpdateDto)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			var trimmedAboutUpdateDto = new AboutUpdateDto
 			{
@@ -112,9 +112,9 @@ namespace API.Controllers
 
 			_mapper.Map(trimmedAboutUpdateDto, user);
 
-			_userRepository.UpdateUser(user!);
+			_unitOfWork.UserRepository.UpdateUser(user!);
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -130,7 +130,7 @@ namespace API.Controllers
 				return BadRequest("You need to add interests");
 			}
 
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			var userInterests = _inputProcessor.SplitString(interests);
 				
@@ -146,7 +146,7 @@ namespace API.Controllers
 					return BadRequest("You already have one of these interests");
 				}
 				
-				var userInterestFromDb = await _userRepository.GetUserInterestByNameAsync(userInterest);
+				var userInterestFromDb = await _unitOfWork.UserRepository.GetUserInterestByNameAsync(userInterest);
 				
 				if (userInterestFromDb != null)
 				{
@@ -158,7 +158,7 @@ namespace API.Controllers
 				}
 			}
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -169,7 +169,7 @@ namespace API.Controllers
 		[HttpDelete("deleteinterest")]
 		public async Task<ActionResult> DeleteInterest(string interestName)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			var userInterest = user!.UserInterests?.FirstOrDefault(x => x.InterestName == interestName);
 
@@ -180,7 +180,7 @@ namespace API.Controllers
 
 			user!.UserInterests?.Remove(userInterest);
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -191,7 +191,7 @@ namespace API.Controllers
 		[HttpPut("updatecontacts")]
 		public async Task<ActionResult> UpdateContacts(ContactsUpdateDto contactsUpdateDto)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			_mapper.Map(contactsUpdateDto, user);
 
@@ -201,9 +201,9 @@ namespace API.Controllers
 			user.LinkedInLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.LinkedInLink);
 			user.WebsiteLink = _linkTransformer.AddHttpsToLink(contactsUpdateDto.WebsiteLink);
 
-			_userRepository.UpdateUser(user);
+			_unitOfWork.UserRepository.UpdateUser(user);
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return NoContent();
 			}
@@ -214,7 +214,7 @@ namespace API.Controllers
 		[HttpPost("add-photo")]
 		public async Task<ActionResult<UserPhotoDto>> AddPhoto(IFormFile file)
 		{
-			var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			var result = await _photoService.AddPhotoAsync(file, "user");
 
@@ -230,9 +230,9 @@ namespace API.Controllers
 				AppUser = user!
 			};
 
-			_userRepository.AddPhoto(photo);
+			_unitOfWork.UserRepository.AddPhoto(photo);
 
-			if (await _userRepository.SaveAllAsync())
+			if (await _unitOfWork.Complete())
 			{
 				return CreatedAtRoute("GetUser", new { Username = user!.UserName }, _mapper.Map<UserPhotoDto>(photo));
 			}
