@@ -10,7 +10,6 @@ import { Message } from '../_models/message';
 import { User } from '../_models/user';
 import { UserParams } from '../_models/userParams';
 import { AccountService } from './account.service';
-import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 
 @Injectable({
   providedIn: 'root'
@@ -71,32 +70,6 @@ export class MessageService {
 
   stopHubConnection() {
     this.hubConnection.stop();
-  }
-
-  getUserParams() {
-    return this.userParams;
-  }
-
-  setUserParams(params: UserParams) {
-    this.userParams = params;
-  }
-
-  resetUserParams() {
-    this.userParams = new UserParams(this.user);
-    return this.userParams;
-  }
-
-  getMessages(pageNumber, pageSize, container) {
-    let params = getPaginationHeaders(pageNumber, pageSize);
-    params = params.append("Container", container);
-
-    return getPaginatedResult<Message[]>(this.baseUrl + 'messages', params, this.http);
-  }
-
-  getMessageThread(userParams: UserParams, username: string) {
-    let params = getPaginationHeaders(userParams.pageNumber, userParams.pageSize);
-
-    return getPaginatedResult<Message[]>(this.baseUrl + 'messages/thread/' + username, params, this.http);
   }
 
   getConversations() {

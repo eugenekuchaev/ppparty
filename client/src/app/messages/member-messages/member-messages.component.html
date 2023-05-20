@@ -7,15 +7,14 @@
 
             <div class="mb-4">
                 <form #messageForm="ngForm" (ngSubmit)="sendMessage()" autocomplete="off">
-                    <div class="input-group">
-                        <input name="messageContent" required [(ngModel)]="messageContent" type="text"
-                            class="form-control input-sm" placeholder="Send a private message">
-                        <div class="input-group-append">
-                            <button [disabled]="!messageForm.valid" class="btn btn-primary" type="submit">Send</button>
-                        </div>
+                    <div style="display: flex; align-items: center;">
+                        <input name="messageContent" required [(ngModel)]="messageContent" type="text" class="form-control input-sm"
+                            style="margin-right: 10px;" placeholder="Send a private message">
+                        <button [disabled]="!messageForm.valid" class="btn btn-primary" type="submit">Send</button>
                     </div>
                 </form>
             </div>
+            
 
             <ul *ngIf="(messageService.messageThread$ | async)?.length > 0" class="chat">
                 <li *ngFor="let message of (messageService.messageThread$ | async)">
