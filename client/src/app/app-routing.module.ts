@@ -17,6 +17,8 @@ import { EventInvitesFromMembersComponent } from './events/event-invites-from-me
 import { CreateEventComponent } from './events/create-event/create-event.component';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { EditEventComponent } from './events/edit-event/edit-event.component';
+import { PreventUnsavedChangesEditEventGuard } from './_guards/prevent-unsaved-changes-edit-event.guard';
+import { PreventUnsavedChangesEventCreationGuard } from './_guards/prevent-usaved-changes-event-creation.guard';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -34,9 +36,9 @@ const routes: Routes = [
       {path: 'messages/:username', component: MemberMessagesComponent},
       {path: 'events/:eventId', component: EventDetailComponent},
       {path: 'events/invitefrommembers/:username', component: EventInvitesFromMembersComponent},
-      {path: 'createevent', component: CreateEventComponent},
+      {path: 'createevent', component: CreateEventComponent, canDeactivate: [PreventUnsavedChangesEventCreationGuard]},
       {path: 'photoeditor', component: PhotoEditorComponent},
-      {path: 'editevent/:eventId', component: EditEventComponent}
+      {path: 'editevent/:eventId', component: EditEventComponent, canDeactivate: [PreventUnsavedChangesEditEventGuard]}
     ]
   },
   {path: 'errors', component: TestErrorsComponent}, 

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -11,7 +11,7 @@ import { EventsService } from 'src/app/_services/events.service';
   templateUrl: './edit-event.component.html',
   styleUrls: ['./edit-event.component.css']
 })
-export class EditEventComponent {
+export class EditEventComponent implements OnInit {
   @ViewChild('editTagsForm') editTagsForm: NgForm;
   eventEditForm: FormGroup;
   validationErrors: string[] = [];
@@ -20,6 +20,11 @@ export class EditEventComponent {
   tags: string;
   eventId: string;
   initialFormValues: any;
+  @HostListener('window:beforeunload', ['$event']) unloadNotification($event: any) {
+    if (this.eventEditForm.dirty || this.editTagsForm.value !== null) {
+      $event.returnValue = true;
+    }
+  }
 
   constructor(private eventsService: EventsService, private fb: FormBuilder, private route: ActivatedRoute,
     private toastr: ToastrService) {

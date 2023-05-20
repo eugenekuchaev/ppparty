@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras, Router } from '@angular/router';
 import { AppEvent } from 'src/app/_models/appEvent';
@@ -12,6 +12,11 @@ import { EventsService } from 'src/app/_services/events.service';
 export class CreateEventComponent implements OnInit {
   eventCreationForm: FormGroup;
   validationErrors: string[] = [];
+  @HostListener('window:beforeunload', ['$event']) unloadNotification($event: any) {
+    if (this.eventCreationForm.dirty) {
+      $event.returnValue = true;
+    }
+  }
 
   constructor(private eventsService: EventsService, private fb: FormBuilder, private router: Router) { }
 
