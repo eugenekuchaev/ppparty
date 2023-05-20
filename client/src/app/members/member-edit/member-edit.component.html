@@ -85,7 +85,7 @@
                         name="about" 
                         class="form-control" 
                         rows="8"
-                        placeholder="Full name" 
+                        placeholder="Tell about yourself" 
                         autocomplete="off">
                     </textarea>
                 </div>
@@ -95,7 +95,7 @@
             <ng-container *ngFor="let userInterest of userInterests">
                 <span 
                     class="badge bg-primary" 
-                    (click)="deleteInterest(userInterest.interestName)">
+                    (click)="removeInterest(userInterest.interestName)">
                         {{userInterest.interestName}}
                 </span>
             </ng-container>

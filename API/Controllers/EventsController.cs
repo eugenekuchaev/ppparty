@@ -17,17 +17,17 @@ namespace API.Controllers
 		private readonly IPhotoService _photoService;
 		private readonly IMapper _mapper;
 		private readonly InputProcessor _inputProcessor;
-        private readonly IUnitOfWork _unitOfWork;
+		private readonly IUnitOfWork _unitOfWork;
 
 		public EventsController(IUnitOfWork unitOfWork, IPhotoService photoService, IMapper mapper, InputProcessor inputProcessor)
 		{
-            _unitOfWork = unitOfWork;
+			_unitOfWork = unitOfWork;
 			_inputProcessor = inputProcessor;
 			_mapper = mapper;
 			_photoService = photoService;
 		}
 
-		[HttpGet("allevents")]
+		[HttpGet("all-events")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetAllEvents([FromQuery] EventParams eventParams)
 		{
 			var events = await _unitOfWork.EventRepository.GetAllEventsAsync(eventParams);
@@ -37,25 +37,25 @@ namespace API.Controllers
 			return Ok(events);
 		}
 
-		[HttpGet("ownedevents")]
+		[HttpGet("owned-events")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetOwnedEvents()
 		{
 			return Ok(await _unitOfWork.EventRepository.GetOwnedEventsAsync(User.GetUsername()));
 		}
 
-		[HttpGet("participatedevents")]
+		[HttpGet("participated-events")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetParticipatedEvents()
 		{
 			return Ok(await _unitOfWork.EventRepository.GetParticipatedEventsAsync(User.GetUsername()));
 		}
 
-		[HttpGet("friendsevents")]
+		[HttpGet("friends-events")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetFriendsEvents()
 		{
 			return Ok(await _unitOfWork.EventRepository.GetFriendsEventsAsync(User.GetUsername()));
 		}
 
-		[HttpGet("recommendedevents")]
+		[HttpGet("recommended-events")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetRecommendedEvents()
 		{
 			return Ok(await _unitOfWork.EventRepository.GetRecommendedEventsAsync(User.GetUsername()));
@@ -72,63 +72,38 @@ namespace API.Controllers
 				return appEvent;
 			}
 
-			return BadRequest("Event not found");
+			return NotFound("Event not found");
 		}
 
 		[HttpPost]
 		public async Task<ActionResult<Event>> CreateEvent(EventDto eventDto)
 		{
-			if (eventDto.EventDates!.Any(x => x.StartDate > x.EndDate))
+			if (_inputProcessor.HasInvalidDates(eventDto.EventDates!, out string? invalidDateMessage))
 			{
-				return BadRequest("End date cannot be earlier than start date");
+				return BadRequest(invalidDateMessage);
 			}
-			
-			if (eventDto.EventDates!.Any(x => x.StartDate.AddDays(1) < x.EndDate))
-			{
-				return BadRequest("Start date and end date cannot differ for more than one day");
-			}
-			
+
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = _mapper.Map<Event>(eventDto);
-			string tags = eventDto.EventTagsString!;
 
-			if (!_inputProcessor.ValidateInput(tags))
+			if (!_inputProcessor.IsValidInputForInterestsAndTags(eventDto.EventTagsString!))
 			{
 				return BadRequest("You need to add tags");
 			}
 
 			appEvent.EventTags = new List<EventTag>();
-			var eventTags = _inputProcessor.SplitString(tags);
 
-			foreach (var eventTag in eventTags)
+			var processResult = await ProcessEventTags(appEvent, eventDto.EventTagsString!);
+
+			if (!processResult.IsSuccess)
 			{
-				if (eventTag.Length > 32)
-				{
-					return BadRequest("One of the interests is too long");
-				}
-
-				if (appEvent.EventTags.Any(x => x.EventTagName == eventTag))
-				{
-					return BadRequest("There's already one of these tags in this event");
-				}
-
-				var eventTagFromDb = await _unitOfWork.EventRepository.GetEventTagByNameAsync(eventTag);
-
-				if (eventTagFromDb != null)
-				{
-					appEvent.EventTags.Add(eventTagFromDb);
-				}
-				else
-				{
-					appEvent.EventTags.Add(new EventTag { EventTagName = eventTag });
-				}
+				return BadRequest(processResult.ErrorMessage);
 			}
 
 			appEvent.EventPhoto = new EventPhoto
 			{
 				PhotoUrl = "https://res.cloudinary.com/duy1fjz1z/image/upload/v1681336855/bisnwfwnxyg6flumjed4.png"
 			};
-
 			appEvent.EventOwner = user!;
 			appEvent.Participants = new List<AppUser>();
 			appEvent.Participants.Add(user!);
@@ -138,13 +113,13 @@ namespace API.Controllers
 
 			if (await _unitOfWork.Complete())
 			{
-				return Ok(appEvent);
+				return CreatedAtRoute("GetEvent", new { eventId = appEvent.Id }, appEvent);
 			}
 
 			return BadRequest("Failed to create event");
 		}
 
-		[HttpPut("participateinevent/{eventId}")]
+		[HttpPatch("participate-in-event/{eventId}")]
 		public async Task<ActionResult> ParticipateInEvent(int eventId)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -153,7 +128,7 @@ namespace API.Controllers
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
 			if (appEvent.Participants!.Any(x => x.Username == user.UserName))
@@ -165,13 +140,13 @@ namespace API.Controllers
 
 			if (await _unitOfWork.Complete())
 			{
-				return Ok();
+				return NoContent();
 			}
 
 			return BadRequest("Failed to participate in the event");
 		}
 
-		[HttpDelete("stopparticipatinginevent/{eventId}")]
+		[HttpPatch("stop-participating-in-event/{eventId}")]
 		public async Task<ActionResult> StopParticipatingInEvent(int eventId)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -180,7 +155,7 @@ namespace API.Controllers
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
 			if (appEvent.EventOwner!.Username == user.UserName)
@@ -192,31 +167,26 @@ namespace API.Controllers
 
 			if (await _unitOfWork.Complete())
 			{
-				return Ok();
+				return NoContent();
 			}
 
 			return BadRequest("Failed to stop participating in the event");
 		}
 
-		[HttpPut("updateevent/{eventId}")]
+		[HttpPut("update-event/{eventId}")]
 		public async Task<ActionResult> UpdateEvent(EventUpdateDto eventUpdateDto, int eventId)
 		{
-			if (eventUpdateDto.EventDates!.Any(x => x.StartDate > x.EndDate))
+			if (_inputProcessor.HasInvalidDates(eventUpdateDto.EventDates!, out string? invalidDateMessage))
 			{
-				return BadRequest("End date cannot be earlier than start date");
+				return BadRequest(invalidDateMessage);
 			}
-			
-			if (eventUpdateDto.EventDates!.Any(x => x.StartDate.AddDays(1) < x.EndDate))
-			{
-				return BadRequest("Start date and end date cannot differ for more than one day");
-			}
-			
+
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
 			if (appEvent.EventOwnerId != user!.Id)
@@ -224,39 +194,27 @@ namespace API.Controllers
 				return BadRequest("You are not the owner of this event");
 			}
 
-			if (eventUpdateDto.EventDates != null)
-			{
-				bool areEventDatesEqual = appEvent.EventDates
-					.Select(ed => (ed.StartDate, ed.EndDate))
-					.SequenceEqual(eventUpdateDto.EventDates!
-						.Select(ed => (ed.StartDate, ed.EndDate)));
-
-				_mapper.Map(eventUpdateDto, appEvent);
-				appEvent.Currency = "usd";
-
-				appEvent.EventDates.Clear();
-
-				var newEventDates = _mapper.Map<IEnumerable<EventDate>>(eventUpdateDto.EventDates);
-				appEvent.EventDates = newEventDates.ToList();
-
-				if (!areEventDatesEqual)
-				{
-					foreach (var participant in appEvent.Participants!)
-					{
-						var notification = new EventNotification
-						{
-							NotificationMessage = $"{appEvent.EventName} dates have been changed.",
-							EventId = appEvent.Id,
-							EventName = appEvent.EventName!
-						};
-
-						await _unitOfWork.EventRepository.NotifyEventParticipant(participant.Id, notification);
-					}
-				}
-			}
-			else 
+			if (eventUpdateDto.EventDates == null)
 			{
 				return BadRequest("You have to add event dates");
+			}
+			
+			bool areEventDatesEqual = appEvent.EventDates
+				.Select(ed => (ed.StartDate, ed.EndDate))
+				.SequenceEqual(eventUpdateDto.EventDates!
+					.Select(ed => (ed.StartDate, ed.EndDate)));
+
+			_mapper.Map(eventUpdateDto, appEvent);
+
+			appEvent.EventDates.Clear();
+			var newEventDates = _mapper.Map<IEnumerable<EventDate>>(eventUpdateDto.EventDates);
+			appEvent.EventDates = newEventDates.ToList();
+
+			appEvent.Currency = "usd";
+
+			if (!areEventDatesEqual)
+			{
+				await NotifyEventParticipants(appEvent);
 			}
 
 			_unitOfWork.EventRepository.UpdateEvent(appEvent);
@@ -269,10 +227,10 @@ namespace API.Controllers
 			return BadRequest("Failed to update user");
 		}
 
-		[HttpPost("addtags/{eventId}")]
-		public async Task<ActionResult> AddTags([FromBody] string tags, int eventId)
+		[HttpPost("add-tags/{eventId}")]
+		public async Task<ActionResult> AddTags(int eventId, [FromBody] string tags)
 		{
-			if (!_inputProcessor.ValidateInput(tags))
+			if (!_inputProcessor.IsValidInputForInterestsAndTags(tags))
 			{
 				return BadRequest("You need to add tags");
 			}
@@ -282,7 +240,7 @@ namespace API.Controllers
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
 			if (appEvent.EventOwnerId != user!.Id)
@@ -290,49 +248,30 @@ namespace API.Controllers
 				return BadRequest("You are not the owner of this event");
 			}
 
-			var eventTags = _inputProcessor.SplitString(tags);
+			var processResult = await ProcessEventTags(appEvent, tags);
 
-			foreach (var eventTag in eventTags)
+			if (!processResult.IsSuccess)
 			{
-				if (eventTag.Length > 32)
-				{
-					return BadRequest("One of the interests is too long");
-				}
-
-				if (appEvent.EventTags.Any(x => x.EventTagName == eventTag))
-				{
-					return BadRequest("There's already one of these tags in this event");
-				}
-
-				var eventTagFromDb = await _unitOfWork.EventRepository.GetEventTagByNameAsync(eventTag);
-
-				if (eventTagFromDb != null)
-				{
-					appEvent.EventTags.Add(eventTagFromDb);
-				}
-				else
-				{
-					appEvent.EventTags.Add(new EventTag { EventTagName = eventTag });
-				}
+				return BadRequest(processResult.ErrorMessage);
 			}
 
 			if (await _unitOfWork.Complete())
 			{
-				return NoContent();
+				return CreatedAtRoute("GetEvent", new { eventId = appEvent.Id }, null);
 			}
 
 			return BadRequest("Failed to add tags");
 		}
 
-		[HttpDelete("deletetag/{eventId}")]
-		public async Task<ActionResult> DeleteTag(string tagName, int eventId)
+		[HttpPatch("remove-tag/{eventId}")]
+		public async Task<ActionResult> RemoveTag(int eventId, [FromBody]string tagName)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
 			if (appEvent.EventOwnerId != user!.Id)
@@ -344,7 +283,13 @@ namespace API.Controllers
 
 			if (eventTag == null)
 			{
-				return BadRequest("There's no tag with this name");
+				return NotFound("There's no tag with this name");
+			}
+			
+			if (!_inputProcessor.IsCorrectNumberOfElements(numberOfElementsInEntity: appEvent.EventTags.Count(), 
+				out string? errorMessage, elementName: "tag", numberOfNewElements: -1))
+			{
+				return BadRequest(errorMessage);
 			}
 
 			appEvent.EventTags.Remove(eventTag);
@@ -365,7 +310,7 @@ namespace API.Controllers
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this id");
+				return NotFound("There's no event with this id");
 			}
 
 			if (appEvent.EventOwnerId != user!.Id)
@@ -397,7 +342,8 @@ namespace API.Controllers
 			return BadRequest("Problem adding photo");
 		}
 
-		[HttpDelete("deleteevent/{eventId}")]
+		[Authorize(Policy = "RequireModeratorRole")]
+		[HttpDelete("delete-event/{eventId}")]
 		public async Task<ActionResult> DeleteEvent(int eventId)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -405,12 +351,7 @@ namespace API.Controllers
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
-			}
-
-			if (appEvent.EventOwnerId != user!.Id)
-			{
-				return BadRequest("You are not the owner of this event");
+				return NotFound("There's no event with this Id");
 			}
 
 			_unitOfWork.EventRepository.DeleteEvent(appEvent);
@@ -422,8 +363,14 @@ namespace API.Controllers
 
 			return BadRequest("Failed to delete event");
 		}
+		
+		[HttpGet("invites")]
+		public async Task<ActionResult<IEnumerable<EventDto>>> GetInvites()
+		{
+			return Ok(await _unitOfWork.EventRepository.GetInvitesAsync(User.GetUsername()));
+		}
 
-		[HttpPut("invitetoevent/{eventId}")]
+		[HttpPatch("invite-to-event/{eventId}")]
 		public async Task<ActionResult> InviteToEvent(string username, int eventId)
 		{
 			var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -431,7 +378,7 @@ namespace API.Controllers
 
 			if (recipient == null)
 			{
-				return BadRequest("There's no such a user");
+				return NotFound("There's no such a user");
 			}
 
 			if (!await _unitOfWork.FriendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
@@ -443,7 +390,7 @@ namespace API.Controllers
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
 			if (appEvent.Participants.Any(x => x.UserName == recipient.UserName))
@@ -457,19 +404,13 @@ namespace API.Controllers
 
 			if (await _unitOfWork.Complete())
 			{
-				return Ok();
+				return NoContent();
 			}
 
 			return BadRequest("Failed to invite user to the event");
 		}
 
-		[HttpGet("invites")]
-		public async Task<ActionResult<IEnumerable<EventDto>>> GetInvites()
-		{
-			return Ok(await _unitOfWork.EventRepository.GetInvitesAsync(User.GetUsername()));
-		}
-
-		[HttpDelete("declineinvitation/{eventId}")]
+		[HttpPatch("decline-invitation/{eventId}")]
 		public async Task<ActionResult> DeclineInvitation(int eventId)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -478,86 +419,132 @@ namespace API.Controllers
 
 			if (await _unitOfWork.Complete())
 			{
-				return Ok();
+				return NoContent();
 			}
 
 			return BadRequest("Failed to decline invitation");
 		}
 
-		[HttpPut("cancelevent/{eventId}")]
+		[HttpPatch("cancel-event/{eventId}")]
 		public async Task<ActionResult> CancelEvent(int eventId)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
-			var appEvent = await _unitOfWork.EventRepository.GetEventAsync(eventId, user!.Id);
+			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
 
 			if (appEvent == null)
 			{
-				return BadRequest("There's no event with this Id");
+				return NotFound("There's no event with this Id");
 			}
 
-			if (appEvent.EventOwner!.Username != user.UserName)
+			if (appEvent.EventOwner!.UserName != user!.UserName)
 			{
 				return BadRequest("You are not the owner of this event");
 			}
-			
+
 			if (appEvent.IsCancelled == true)
 			{
 				return BadRequest("This event has already been cancelled");
 			}
 
 			await _unitOfWork.EventRepository.CancelEvent(eventId);
+			
+			await NotifyEventParticipants(appEvent);
 
+			if (await _unitOfWork.Complete())
+			{
+				return NoContent();
+			}
+
+			return BadRequest("Failed to cancel the event");
+		}
+
+		[HttpGet("event-notifications")]
+		public async Task<ActionResult<IEnumerable<EventNotification>>> GetEventNotifications()
+		{
+			return Ok(await _unitOfWork.EventRepository.GetEventNotificationsAsync(User.GetUsername()));
+		}
+
+		[HttpPatch("read-event-notification/{notificationId}")]
+		public async Task<ActionResult> ReadEventNotification(int notificationId)
+		{
+			await _unitOfWork.EventRepository.ReadEventNotification(notificationId);
+			await _unitOfWork.Complete();
+			
+			return NoContent();
+		}
+
+		[HttpGet("number-of-owned-events/{username}")]
+		public async Task<ActionResult<int>> GetNumberOfOwnedEvents(string username)
+		{
+			return await _unitOfWork.EventRepository.GetNumberOfOwnedEvents(username);
+		}
+
+		[HttpGet("events-for-invitations")]
+		public async Task<ActionResult<IEnumerable<EventDto>>> GetEventsForInvitations(string friendUsername)
+		{
+			return Ok(await _unitOfWork.EventRepository.GetActualParticipatedAndOwnedEvents(User.GetUsername(), friendUsername));
+		}
+
+		[HttpGet("has-user-been-invited-to-event")]
+		public ActionResult<bool> CheckIfUserHasBeenInvited(string username, int eventId)
+		{
+			return Ok(_unitOfWork.EventRepository.CheckIfUserHasBeenInvited(username, eventId));
+		}
+
+		// Helper methods
+		private async Task<ProcessResult> ProcessEventTags(Event appEvent, string tags)
+		{
+			var eventTags = _inputProcessor.SplitString(tags);
+			
+			var processResult = new ProcessResult();
+			
+			if (!_inputProcessor.IsCorrectNumberOfElements(numberOfElementsInEntity: appEvent.EventTags.Count(), 
+				out string? errorMessage, elementName: "tag", numberOfNewElements: eventTags.Count()))
+			{
+				processResult.IsSuccess = false;
+				processResult.ErrorMessage = errorMessage;
+				return processResult;
+			}
+
+			foreach (var eventTag in eventTags)
+			{
+				if (_inputProcessor.HasInvalidTags(appEvent, eventTag, out string? invalidTagMessage))
+				{
+					processResult.IsSuccess = false;
+					processResult.ErrorMessage = invalidTagMessage;
+					return processResult;
+				}
+
+				var eventTagFromDb = await _unitOfWork.EventRepository.GetEventTagByNameAsync(eventTag);
+
+				if (eventTagFromDb != null)
+				{
+					appEvent.EventTags.Add(eventTagFromDb);
+				}
+				else
+				{
+					appEvent.EventTags.Add(new EventTag { EventTagName = eventTag });
+				}
+			}
+
+			processResult.IsSuccess = true;
+			return processResult;
+		}
+
+		private async Task NotifyEventParticipants(Event appEvent)
+		{
 			foreach (var participant in appEvent.Participants!)
 			{
 				var notification = new EventNotification
 				{
-					NotificationMessage = $"{appEvent.EventName} has been cancelled.",
+					NotificationMessage = $"{appEvent.EventName} has been postponed or cancelled.",
 					EventId = appEvent.Id,
 					EventName = appEvent.EventName!
 				};
 
 				await _unitOfWork.EventRepository.NotifyEventParticipant(participant.Id, notification);
 			}
-
-			if (await _unitOfWork.Complete())
-			{
-				return Ok();
-			}
-
-			return BadRequest("Failed to cancel the event");
-		}
-
-		[HttpGet("eventnotifications")]
-		public async Task<ActionResult<IEnumerable<EventNotification>>> GetEventNotifications()
-		{
-			return Ok(await _unitOfWork.EventRepository.GetEventNotificationsAsync(User.GetUsername()));
-		}
-
-		[HttpPut("readeventnotification/{notificationId}")]
-		public async Task<ActionResult> ReadEventNotification(int notificationId)
-		{
-			await _unitOfWork.EventRepository.ReadEventNotification(notificationId);
-			await _unitOfWork.Complete();
-			return Ok();
-		}
-		
-		[HttpGet("numberofownedevents/{username}")]
-		public async Task<ActionResult<int>> GetNumberOfOwnedEvents(string username)
-		{
-			return await _unitOfWork.EventRepository.GetNumberOfOwnedEvents(username);
-		}
-		
-		[HttpGet("eventsforinvitations")]
-		public async Task<ActionResult<IEnumerable<EventDto>>> GetEventsForInvitations(string friendUsername)
-		{
-			return Ok(await _unitOfWork.EventRepository.GetActualParticipatedAndOwnedEvents(User.GetUsername(), friendUsername));
-		}
-		
-		[HttpGet("hasuserbeeninvitedtoevent")]
-		public ActionResult<bool> CheckIfUserHasBeenInvited(string username, int eventId)
-		{
-			return Ok(_unitOfWork.EventRepository.CheckIfUserHasBeenInvited(username, eventId));
 		}
 	}
 }

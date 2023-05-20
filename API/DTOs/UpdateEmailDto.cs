@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.DTOs
 {
-    public class ChangeEmailDto
+    public class UpdateEmailDto
     {
         [EmailAddress]
 		[Required]

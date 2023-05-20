@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { TestErrorsComponent } from './errors/test-errors/test-errors.component';
@@ -12,7 +11,6 @@ import { MemberListComponent } from './members/member-list/member-list.component
 import { MemberSecurityComponent } from './members/member-security/member-security.component';
 import { MemberMessagesComponent } from './messages/member-messages/member-messages.component';
 import { MessagesComponent } from './messages/messages.component';
-import { AdminGuard } from './_guards/admin.guard';
 import { AuthGuard } from './_guards/auth.guard';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
 import { EventInvitesFromMembersComponent } from './events/event-invites-from-members/event-invites-from-members.component';
@@ -34,7 +32,6 @@ const routes: Routes = [
       {path: 'messages', component: MessagesComponent},
       {path: 'member/security', component: MemberSecurityComponent},
       {path: 'messages/:username', component: MemberMessagesComponent},
-      {path: 'admin', component: AdminPanelComponent, canActivate: [AdminGuard]},
       {path: 'events/:eventId', component: EventDetailComponent},
       {path: 'events/invitefrommembers/:username', component: EventInvitesFromMembersComponent},
       {path: 'createevent', component: CreateEventComponent},

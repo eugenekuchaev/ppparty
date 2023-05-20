@@ -18,7 +18,7 @@ namespace API.Controllers
 		}
 
 		[Authorize(Policy = "RequireAdminRole")]
-		[HttpGet("users-with-roles")]
+		[HttpGet("users-with-roles", Name = "UsersWithRoles")]
 		public async Task<ActionResult> GetUsersWithRoles()
 		{
 			var users = await _userManager.Users
@@ -36,7 +36,7 @@ namespace API.Controllers
 			return Ok(users);
 		}
 		
-		[HttpPost("edit-roles/{username}")]
+		[HttpPatch("edit-roles/{username}")]
 		public async Task<ActionResult> EditRole(string username, [FromQuery]string roles)
 		{
 			var selectedRoles = roles.Split(",").ToArray();	
@@ -62,14 +62,7 @@ namespace API.Controllers
 				return BadRequest("Failed to remove from roles");
 			}
 			
-			return Ok(await _userManager.GetRolesAsync(user));
-		}
-
-		[Authorize(Policy = "ModeratePhotoRole")]
-		[HttpGet("photos-to-moderate")]
-		public ActionResult GetPhotosForModeration()
-		{
-			return Ok("Only admins or moderators can see this");
+			return NoContent();
 		}
 	}
 }

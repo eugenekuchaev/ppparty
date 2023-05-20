@@ -30,9 +30,9 @@ export class MemberListComponent implements OnInit {
 
   ngOnInit(): void {
     forkJoin({
-      mutualFriends: this.membersService.getFriends("mutualfriends"),
-      friendRequests: this.membersService.getFriends("friendrequests"),
-      addedToFriends: this.membersService.getFriends("addedtofriends")
+      mutualFriends: this.membersService.getFriends("mutual-friends"),
+      friendRequests: this.membersService.getFriends("friend-requests"),
+      addedToFriends: this.membersService.getFriends("added-to-friends")
     }).subscribe({
       next: response => {
         this.loadMembers();
@@ -54,7 +54,7 @@ export class MemberListComponent implements OnInit {
   }
 
   loadMutualFriends() {
-    this.membersService.getFriends("mutualfriends").subscribe({
+    this.membersService.getFriends("mutual-friends").subscribe({
       next: response => {
         this.mutualFriends = response;
       }
@@ -62,7 +62,7 @@ export class MemberListComponent implements OnInit {
   }
 
   loadFriendRequests() {
-    this.membersService.getFriends("friendrequests").subscribe({
+    this.membersService.getFriends("friend-requests").subscribe({
       next: response => {
         this.friendRequests = response.filter(fr => !this.mutualFriends.some(mutual => mutual.id === fr.id));
       }
@@ -70,7 +70,7 @@ export class MemberListComponent implements OnInit {
   }
 
   loadAddedToFriends() {
-    this.membersService.getFriends("addedtofriends").subscribe({
+    this.membersService.getFriends("added-to-friends").subscribe({
       next: response => {
         this.addedToFriends = response;
       }

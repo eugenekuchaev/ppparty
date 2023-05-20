@@ -24,19 +24,19 @@ namespace API.Data
 			var users = _context.Users.AsQueryable();
 			var friends = _context.Friends.AsQueryable();
 
-			if (predicate == "friendrequests")
+			if (predicate == "friend-requests")
 			{
 				friends = friends.Where(friend => friend.AddedToFriendsUserId == userId);
 				users = friends.Select(friend => friend.AddingToFriendsUser)!;
 			}
 
-			if (predicate == "addedtofriends")
+			if (predicate == "added-to-friends")
 			{
 				friends = friends.Where(friend => friend.AddingToFriendsUserId == userId);
 				users = friends.Select(friend => friend.AddedToFriendsUser)!;
 			}
 
-			if (predicate == "mutualfriends")
+			if (predicate == "mutual-friends")
 			{
 				var friendsAddedTo = friends
 					.Where(friend => friend.AddedToFriendsUserId == userId)

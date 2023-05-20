@@ -61,15 +61,19 @@ export class MemberEditComponent implements OnInit {
   }
 
   updateLocation() {
+    if (!this.member.city || this.member.city.trim() === '') {
+      this.member.city = 'Somewhere';
+    }
+  
     this.memberService.updateLocation(this.member).subscribe({
       next: () => {
         this.toastr.success('Location updated');
         this.editLocationForm.reset(this.member);
       },
       error: error => {
-        this.toastr.error("One of the fields is too long")
+        this.toastr.error('One of the fields is too long');
       }
-    })
+    });
   }
 
   updateAbout() {
@@ -84,8 +88,8 @@ export class MemberEditComponent implements OnInit {
     })
   }
 
-  deleteInterest(interest: string) {
-    this.memberService.deleteInterest(interest).subscribe({
+  removeInterest(interest: string) {
+    this.memberService.removeInterest(interest).subscribe({
       next: () => {
         this.toastr.success('Interest deleted');
         this.userInterests = this.userInterests.filter(ui => ui.interestName !== interest);
@@ -102,7 +106,8 @@ export class MemberEditComponent implements OnInit {
         // This array of interests is temporary, 
         // the property userInterests is reloaded from the API each time a user reloads a page 
         // Id is set to 0 because it's not used in any API requests
-        const interestsArray: string[] = interests.split(',').map((interest: string) => interest.trim());
+        const interestsArray: string[] = interests.split(',').map((interest: string) => 
+          interest.replace(/(^-+)|(-+$)|[^a-zA-Z0-9-]/g, '').replace(/(-){2,}/g, '-').trim());
         interestsArray.forEach((interest: string) => {
           if (interest !== "" && this.userInterests.find(x => x.interestName === interest) == null) {
             const newInterest: UserInterest = {

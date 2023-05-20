@@ -28,11 +28,7 @@ import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { TimeagoModule } from 'ngx-timeago';
 import { CustomTimeagoPipe } from './timeago.pipe';
 import { MemberMessagesComponent } from './messages/member-messages/member-messages.component';
-import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { HasRoleDirective } from './_directives/has-role.directive';
-import { UserManagementComponent } from './admin/user-management/user-management.component';
-import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
-import { RolesModalComponent } from './modals/roles-modal/roles-modal.component';
 import { EventCardComponent } from './events/event-card/event-card.component';
 import { EventDetailComponent } from './events/event-detail/event-detail.component';
 import { EventNotificationsComponent } from './events/event-notifications/event-notifications.component';
@@ -62,11 +58,7 @@ import { EditEventComponent } from './events/edit-event/edit-event.component';
     TextInputComponent,
     CustomTimeagoPipe,
     MemberMessagesComponent,
-    AdminPanelComponent,
     HasRoleDirective,
-    UserManagementComponent,
-    PhotoManagementComponent,
-    RolesModalComponent,
     EventCardComponent,
     EventDetailComponent,
     EventNotificationsComponent,

@@ -39,11 +39,11 @@ export class AccountService {
   }
 
   updateEmail(model: any) {
-    return this.http.put(this.baseUrl + 'account/changeemail', model);
+    return this.http.patch(this.baseUrl + 'account/update-email', model);
   }
 
   changePassword(model: any) {
-    return this.http.put(this.baseUrl + 'account/changepassword', model);
+    return this.http.patch(this.baseUrl + 'account/change-password', model);
   }
 
   setCurrentUser(user: User) {

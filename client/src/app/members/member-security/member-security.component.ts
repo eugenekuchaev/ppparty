@@ -14,8 +14,6 @@ import { MembersService } from 'src/app/_services/members.service';
   styleUrls: ['./member-security.component.css']
 })
 export class MemberSecurityComponent {
-  @ViewChild('editEmail') editEmail: NgForm;
-  @ViewChild('editPassword') editPassword: NgForm;
   editEmailForm: FormGroup;
   emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,7}$';
   emailValidationErrors: string[] = [];
@@ -59,12 +57,12 @@ export class MemberSecurityComponent {
       }
     });
   }
-  
 
   updateEmail() {
     this.accountService.updateEmail(this.editEmailForm.value).subscribe({
       next: response => {
         this.toastr.success("Email updated");
+        this.editEmailForm.markAsPristine();
       },
       error: error => {
         this.emailValidationErrors = error;

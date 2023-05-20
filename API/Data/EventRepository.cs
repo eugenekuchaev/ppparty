@@ -178,7 +178,7 @@ namespace API.Data
 			if (eventDto != null)
 			{
 				var eventParticipants = eventDto.Participants?.Select(x => x.Id) ?? new List<int>();
-				var mutualFriends = await _friendsRepository.GetFriends("mutualfriends", userId);
+				var mutualFriends = await _friendsRepository.GetFriends("mutual-friends", userId);
 				var friendsParticipantIds = mutualFriends
 					.Where(friend => eventParticipants.Contains(friend.Id))
 					.Select(friend => friend.Id)
@@ -195,8 +195,6 @@ namespace API.Data
 						eventDto.FriendsParticipants = friendsParticipants;
 					}
 				}
-
-				eventDto.EventPhotoUrl = eventDto!.EventPhoto!.PhotoUrl;
 			}
 
 			return eventDto;
@@ -255,13 +253,15 @@ namespace API.Data
 		{
 			var user = await _userRepository.GetUserByUsernameAsync(username);
 
-			var mutualFriends = await _friendsRepository.GetFriends("mutualfriends", user!.Id);
+			var mutualFriends = await _friendsRepository.GetFriends("mutual-friends", user!.Id);
 
 			var friendIds = mutualFriends.Select(f => f.Id).ToList();
 
 			return await _context.Events
 				.Where(e => e.Participants.Any(x => friendIds.Contains(x.Id)))
 				.Where(x => x.EventDates.Any(y => y.EndDate > DateTime.UtcNow))
+				.Where(x => x.EventOwnerId != user.Id)
+				.Where(x => !x.IsCancelled)
 				.OrderBy(x => x.EventDates!.Min(y => y.StartDate))
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)
 				.ToListAsync();

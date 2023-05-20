@@ -117,7 +117,8 @@ export class EditEventComponent {
   addTags(tags: string) {
     this.eventsService.addTags(tags, this.appEvent.id).subscribe({
       next: () => {
-        const tagsArray: string[] = tags.split(',').map((tag: string) => tag.trim());
+        const tagsArray: string[] = tags.split(',').map((tag: string) => 
+          tag.replace(/(^-+)|(-+$)|[^a-zA-Z0-9-]/g, '').replace(/(-){2,}/g, '-').trim());
         tagsArray.forEach((tag: string) => {
           if (tag !== "" && this.eventTags.find(x => x.eventTagName === tag) == null) {
             const newTag: EventTag = {
@@ -134,7 +135,7 @@ export class EditEventComponent {
   }
 
   deleteTag(tag: string) {
-    this.eventsService.deleteTag(tag, this.appEvent.id).subscribe({
+    this.eventsService.removeTag(tag, this.appEvent.id).subscribe({
       next: () => {
         this.toastr.success('Tag deleted');
         this.eventTags = this.eventTags.filter(ui => ui.eventTagName !== tag);

@@ -1,6 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-        <a class="navbar-brand" routerLink='/' routerLinkActive='active'>ppparty</a>
+        <a class="navbar-brand" [routerLink]="(accountService.currentUser$ | async) ? 
+            '/events/' : ''" routerLinkActive="active">ppparty</a>
+
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
             <ng-container *ngIf="accountService.currentUser$ | async">
                 <li class="nav-item">
@@ -11,9 +13,6 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink='/messages' routerLinkActive='active'>Messages</a>
-                </li>
-                <li *appHasRole='["Admin", "Moderator"]' class="nav-item">
-                    <a class="nav-link" routerLink='/admin' routerLinkActive='active'>Admin</a>
                 </li>
             </ng-container>
         </ul>

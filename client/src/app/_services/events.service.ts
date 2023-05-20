@@ -59,7 +59,7 @@ export class EventsService {
       params = params.append('userInterest', eventParams.eventTag);
     }
 
-    return getPaginatedResult<AppEvent[]>(this.baseUrl + 'events/allevents', params, this.http).pipe(
+    return getPaginatedResult<AppEvent[]>(this.baseUrl + 'events/all-events', params, this.http).pipe(
       map(response => {
         this.eventCache.set(Object.values(eventParams).join('-'), response);
         return response;
@@ -72,23 +72,23 @@ export class EventsService {
   }
 
   getOwnedEvents() {
-    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/ownedevents');
+    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/owned-events');
   }
 
   getParticipatedEvents() {
-    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/participatedevents');
+    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/participated-events');
   }
 
   getFriendsEvents() {
-    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/friendsevents');
+    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/friends-events');
   }
 
   getRecommendedEvents() {
-    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/recommendedevents');
+    return this.http.get<Partial<AppEvent[]>>(this.baseUrl + 'events/recommended-events');
   }
 
   getEventNotifications() {
-    return this.http.get<Partial<EventNotification[]>>(this.baseUrl + 'events/eventnotifications');
+    return this.http.get<Partial<EventNotification[]>>(this.baseUrl + 'events/event-notifications');
   }
 
   createEvent(appEvent: AppEvent) {
@@ -96,32 +96,33 @@ export class EventsService {
   }
 
   participateInEvent(eventId: Number) {
-    return this.http.put(this.baseUrl + 'events/participateinevent/' + eventId, {});
+    return this.http.patch(this.baseUrl + 'events/participate-in-event/' + eventId, {});
   }
 
   stopParticipatingInEvent(eventId: Number) {
-    return this.http.delete(this.baseUrl + 'events/stopparticipatinginevent/' + eventId);
+    return this.http.patch(this.baseUrl + 'events/stop-participating-in-event/' + eventId, {});
   }
 
   updateEvent(appEvent: AppEvent, eventId: Number) {
-    return this.http.put(this.baseUrl + 'events/updateevent/' + eventId, appEvent);
+    return this.http.put(this.baseUrl + 'events/update-event/' + eventId, appEvent);
   }
 
   addTags(tags: string, eventId: Number) {
     const options = { headers: { 'Content-Type': 'application/json' } };
-    return this.http.post(this.baseUrl + 'events/addtags/' + eventId, JSON.stringify(tags), options);
+    return this.http.post(this.baseUrl + 'events/add-tags/' + eventId, JSON.stringify(tags), options);
   }
 
-  deleteTag(tag: string, eventId: Number) {
-    return this.http.delete(this.baseUrl + 'events/deletetag/' + eventId, { params: { tagName: tag } });
+  removeTag(tag: string, eventId: Number) {
+    const options = { headers: { 'Content-Type': 'application/json' } };
+    return this.http.patch(this.baseUrl + 'events/remove-tag/' + eventId, JSON.stringify(tag), options);
   }
 
   deleteEvent(eventId: Number) {
-    return this.http.delete(this.baseUrl + 'events/deleteevent/' + eventId);
+    return this.http.delete(this.baseUrl + 'events/delete-event/' + eventId);
   }
 
   inviteToEvent(username: String, eventId: Number) {
-    return this.http.put(this.baseUrl + 'events/invitetoevent/' + eventId + '?username=' + username, {});
+    return this.http.patch(this.baseUrl + 'events/invite-to-event/' + eventId + '?username=' + username, {});
   }
 
   getInvites() {
@@ -129,27 +130,27 @@ export class EventsService {
   }
 
   declineInvitation(eventId: Number) {
-    return this.http.delete(this.baseUrl + 'events/declineinvitation/' + eventId);
+    return this.http.patch(this.baseUrl + 'events/decline-invitation/' + eventId, {});
   }
 
   cancelEvent(eventId: Number) {
-    return this.http.put(this.baseUrl + 'events/cancelevent/' + eventId, {});
+    return this.http.patch(this.baseUrl + 'events/cancel-event/' + eventId, {});
   }
 
   readEventNotification(notificationId: Number) {
-    return this.http.put(this.baseUrl + 'events/readeventnotification/' + notificationId, {});
+    return this.http.patch(this.baseUrl + 'events/read-event-notification/' + notificationId, {});
   }
 
   getNumberOfOwnedEvents(username: String) {
-    return this.http.get<Number>(this.baseUrl + 'events/numberofownedevents/' + username);
+    return this.http.get<Number>(this.baseUrl + 'events/number-of-owned-events/' + username);
   }
 
   getEventsForInvitations(friendUsername: String) {
-    return this.http.get<AppEvent[]>(this.baseUrl + 'events/eventsforinvitations' + '?friendUsername=' + friendUsername);
+    return this.http.get<AppEvent[]>(this.baseUrl + 'events/events-for-invitations' + '?friendUsername=' + friendUsername);
   }
 
   checkIfUserHasBeenInvited(username: String, eventId: Number) {
-    return this.http.get<Boolean>(this.baseUrl + 'events/hasuserbeeninvitedtoevent' + '?username=' + username + "&eventId=" + eventId);
+    return this.http.get<Boolean>(this.baseUrl + 'events/has-user-been-invited-to-event' + '?username=' + username + "&eventId=" + eventId);
   }
 
   getEventParams() {

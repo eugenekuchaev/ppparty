@@ -37,7 +37,7 @@ namespace API.SignalR
 			await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
 
 			var messages = await _unitOfWork.MessageRepository
-				.GetMessageThreadWithoutParams(Context.User!.GetUsername(), otherUser!);
+				.GetMessageThread(Context.User!.GetUsername(), otherUser!);
 				
 			if (_unitOfWork.HasChanges()) 
 			{
@@ -148,11 +148,9 @@ namespace API.SignalR
 
 		private async Task<Group> RemoveFromMessageGroup()
 		{
-			var group = await _unitOfWork.MessageRepository
-				.GetGroupForConnection(Context.ConnectionId);
+			var group = await _unitOfWork.MessageRepository.GetGroupForConnection(Context.ConnectionId);
 			var connection = group?.Connections.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-			_unitOfWork.MessageRepository
-				.RemoveConnection(connection!);
+			_unitOfWork.MessageRepository.RemoveConnection(connection!);
 
 			if (await _unitOfWork.Complete())
 			{

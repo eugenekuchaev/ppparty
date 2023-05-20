@@ -88,36 +88,37 @@ export class MembersService {
   }
 
   updateName(member: Member) {
-    return this.http.put(this.baseUrl + 'users/updatename', member);
+    return this.http.patch(this.baseUrl + 'users/update-name', member);
   }
 
   updateLocation(member: Member) {
-    return this.http.put(this.baseUrl + 'users/updatelocation', member);
+    return this.http.patch(this.baseUrl + 'users/update-location', member);
   }
 
   updateAbout(member: Member) {
-    return this.http.put(this.baseUrl + 'users/updateabout', member);
+    return this.http.patch(this.baseUrl + 'users/update-about', member);
   }
 
-  deleteInterest(interest: string) {
-    return this.http.delete(this.baseUrl + 'users/deleteinterest', { params: { interestName: interest } });
+  removeInterest(interest: string) {
+    const options = { headers: { 'Content-Type': 'application/json' } };
+    return this.http.patch(this.baseUrl + 'users/remove-interest', JSON.stringify(interest), options);
   }
 
   addInterests(interests: string) {
     const options = { headers: { 'Content-Type': 'application/json' } };
-    return this.http.post(this.baseUrl + 'users/addinterests', JSON.stringify(interests), options);
+    return this.http.post(this.baseUrl + 'users/add-interests', JSON.stringify(interests), options);
   }
 
   updateContacts(member: Member) {
-    return this.http.put(this.baseUrl + 'users/updatecontacts', member);
+    return this.http.patch(this.baseUrl + 'users/update-contacts', member);
   }
 
   addFriend(username: string) {
-    return this.http.post(this.baseUrl + 'friends/' + username, {});
+    return this.http.patch(this.baseUrl + 'friends/add-friend/' + username, {});
   }
 
   deleteFriend(username: string) {
-    return this.http.delete(this.baseUrl + 'friends/' + username);
+    return this.http.patch(this.baseUrl + 'friends/delete-friend/' + username, {});
   }
 
   getFriends(predicate: string) {

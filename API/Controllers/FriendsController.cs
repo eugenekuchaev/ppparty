@@ -19,12 +19,12 @@ namespace API.Controllers
 			_unitOfWork = unitOfWork;
 		}
 		
-		[HttpPost("{username}")]
+		[HttpPatch("add-friend/{username}")]
 		public async Task<ActionResult> AddFriend(string username)
 		{
 			var addingToFriendsUserId = User.GetUserId();
-			var addedToFriendsUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 			var addingToFriendsUser = await _unitOfWork.FriendsRepository.GetUserWithFriends(addingToFriendsUserId);
+			var addedToFriendsUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 			
 			if (addedToFriendsUser == null)
 			{
@@ -53,18 +53,18 @@ namespace API.Controllers
 			
 			if (await _unitOfWork.Complete()) 
 			{
-				return Ok();
+				return NoContent();
 			}
 			
 			return BadRequest("Failed to add user to friends");
 		}
 		
-		[HttpDelete("{username}")]
+		[HttpPatch("delete-friend/{username}")]
 		public async Task<ActionResult> DeleteFriend(string username)
 		{
 			var addingToFriendsUserId = User.GetUserId();
-			var addedToFriendsUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 			var addingToFriendsUser = await _unitOfWork.FriendsRepository.GetUserWithFriends(addingToFriendsUserId);
+			var addedToFriendsUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 			
 			if (addedToFriendsUser == null)
 			{
@@ -78,16 +78,11 @@ namespace API.Controllers
 			
 			var userFriend = await _unitOfWork.FriendsRepository.GetUserFriend(addingToFriendsUserId, addedToFriendsUser.Id);
 			
-			if (userFriend == null) 
-			{
-				return NotFound();
-			}
-			
-			addingToFriendsUser.AddedToFriendsUsers!.Remove(userFriend);
+			addingToFriendsUser.AddedToFriendsUsers!.Remove(userFriend!);
 			
 			if (await _unitOfWork.Complete()) 
 			{
-				return Ok();
+				return NoContent();
 			}
 			
 			return BadRequest("Failed to delete user from friends");
@@ -96,7 +91,7 @@ namespace API.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<FriendDto>>> GetFriends(string predicate)
 		{
-			if (predicate != "friendrequests" && predicate != "addedtofriends" && predicate != "mutualfriends")
+			if (predicate != "friend-requests" && predicate != "added-to-friends" && predicate != "mutual-friends")
 			{
 				return BadRequest("This predicate is undefined");
 			}

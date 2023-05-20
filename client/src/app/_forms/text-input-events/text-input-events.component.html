@@ -30,7 +30,7 @@
         
     </ng-container>
     <div *ngIf="ngControl.control.errors?.required" class="invalid-feedback">
-      Please enter {{label}}
+      Please enter {{label.toLowerCase()}}
     </div>
     <div *ngIf="ngControl.control.errors?.minlength" class="invalid-feedback">
       {{label}} must be at least {{ngControl.control.errors.minlength['requiredLength']}}

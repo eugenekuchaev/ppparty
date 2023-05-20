@@ -1,7 +1,7 @@
 <div class="row" *ngIf="member">
     <div class="col-4"></div>
     <div class="text-center col-4">
-        <h4 class="mb-3">Change email</h4>
+        <h4 class="mb-3">Update email</h4>
         <form [formGroup]="editEmailForm" (ngSubmit)="editEmailForm.valid && updateEmail()" autocomplete="off" class="mb-5">
             <div class="mb-3">
                 <app-text-input 

@@ -58,13 +58,17 @@ namespace API.Controllers
 				return BadRequest(result.Errors);
 			}
 
-			return new UserDto
+			var userDto = new UserDto
 			{
 				Username = user.UserName,
 				Token = await _tokenService.CreateToken(user),
 				PhotoUrl = user.UserPhoto.PhotoUrl,
 				FullName = user.FullName
 			};
+
+			var uri = Url.Action("GetUser", "Users", new { username = user.UserName }, Request.Scheme);
+
+			return Created(uri!, userDto);
 		}
 
 		[HttpPost("login")]
@@ -96,8 +100,8 @@ namespace API.Controllers
 		}
 
 		[Authorize]
-		[HttpPut("changeemail")]
-		public async Task<ActionResult> ChangeEmail(ChangeEmailDto changeEmailDto)
+		[HttpPatch("update-email")]
+		public async Task<ActionResult> UpdateEmail(UpdateEmailDto updateEmailDto)
 		{
 			var user = await _userManager.FindByNameAsync(User.Identity!.Name);
 
@@ -106,7 +110,7 @@ namespace API.Controllers
 				return NotFound();
 			}
 
-			user.Email = changeEmailDto.Email;
+			user.Email = updateEmailDto.Email;
 
 			var result = await _userManager.UpdateAsync(user);
 
@@ -115,12 +119,12 @@ namespace API.Controllers
 				return BadRequest(result.Errors);
 			}
 
-			return Ok();
+			return NoContent();
 		}
 		
 		[Authorize]
-		[HttpPut("changepassword")]
-		public async Task<ActionResult<UserDto>> ChangePassword(ChangePasswordDto changePasswordDto)
+		[HttpPatch("change-password")]
+		public async Task<ActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
 		{
 			if (changePasswordDto.NewPassword != changePasswordDto.ConfirmNewPassword) 
 			{
@@ -129,22 +133,14 @@ namespace API.Controllers
 			
 			var user = await _userManager.FindByNameAsync(User.Identity!.Name);
 
-			if (user == null)
-			{
-				return Unauthorized();
-			}
-
 			var result = await _userManager.ChangePasswordAsync(user, changePasswordDto.OldPassword, changePasswordDto.NewPassword);
 
 			if (!result.Succeeded)
 			{
 				return BadRequest("Wrong password");
 			}
-
-			return new UserDto
-			{
-				Token = await _tokenService.CreateToken(user)
-			};
+			
+			return NoContent();
 		}
 
 		private async Task<bool> UserExists(string username)

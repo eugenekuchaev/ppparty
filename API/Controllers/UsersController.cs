@@ -5,6 +5,7 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -18,12 +19,14 @@ namespace API.Controllers
 		private readonly IPhotoService _photoService;
 		private readonly LinkTransformer _linkTransformer;
 		private readonly InputProcessor _inputProcessor;
-        private readonly IUnitOfWork _unitOfWork;
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly UserManager<AppUser> _userManager;
 
 		public UsersController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService,
-			LinkTransformer linkTransformer, InputProcessor inputProcessor)
+			LinkTransformer linkTransformer, InputProcessor inputProcessor, UserManager<AppUser> userManager)
 		{
-            _unitOfWork = unitOfWork;
+			_userManager = userManager;
+			_unitOfWork = unitOfWork;
 			_inputProcessor = inputProcessor;
 			_linkTransformer = linkTransformer;
 			_photoService = photoService;
@@ -49,7 +52,7 @@ namespace API.Controllers
 			return await _unitOfWork.UserRepository.GetMemberAsync(username);
 		}
 
-		[HttpPut("updatename")]
+		[HttpPatch("update-name")]
 		public async Task<ActionResult> UpdateName(NameUpdateDto nameUpdateDto)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -68,10 +71,10 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to update user");
+			return BadRequest("Failed to update name");
 		}
 
-		[HttpPut("updatelocation")]
+		[HttpPatch("update-location")]
 		public async Task<ActionResult> UpdateLocation(LocationUpdateDto locationUpdateDto)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -97,10 +100,10 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to update user");
+			return BadRequest("Failed to update location");
 		}
 
-		[HttpPut("updateAbout")]
+		[HttpPatch("update-about")]
 		public async Task<ActionResult> UpdateAbout(AboutUpdateDto aboutUpdateDto)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -119,13 +122,13 @@ namespace API.Controllers
 				return NoContent();
 			}
 
-			return BadRequest("Failed to update user");
+			return BadRequest("Failed to update about");
 		}
 
-		[HttpPost("addinterests")]
+		[HttpPost("add-interests")]
 		public async Task<ActionResult> AddInterests([FromBody] string interests)
 		{
-			if (!_inputProcessor.ValidateInput(interests))
+			if (!_inputProcessor.IsValidInputForInterestsAndTags(interests))
 			{
 				return BadRequest("You need to add interests");
 			}
@@ -133,21 +136,27 @@ namespace API.Controllers
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
 			var userInterests = _inputProcessor.SplitString(interests);
-				
+
+			if (!_inputProcessor.IsCorrectNumberOfElements(numberOfElementsInEntity: user!.UserInterests!.Count(),
+				out string? errorMessage, elementName: "interest", numberOfNewElements: userInterests.Count()))
+			{
+				return BadRequest(errorMessage);
+			}
+
 			foreach (var userInterest in userInterests)
 			{
 				if (userInterest.Length > 32)
 				{
 					return BadRequest("One of the interests is too long");
 				}
-				
+
 				if (user!.UserInterests!.Any(x => x.InterestName == userInterest))
 				{
 					return BadRequest("You already have one of these interests");
 				}
-				
+
 				var userInterestFromDb = await _unitOfWork.UserRepository.GetUserInterestByNameAsync(userInterest);
-				
+
 				if (userInterestFromDb != null)
 				{
 					user!.UserInterests?.Add(userInterestFromDb);
@@ -160,14 +169,14 @@ namespace API.Controllers
 
 			if (await _unitOfWork.Complete())
 			{
-				return NoContent();
+				return CreatedAtRoute("GetUser", new { Username = user!.UserName }, null);
 			}
 
 			return BadRequest("Failed to add interests");
 		}
 
-		[HttpDelete("deleteinterest")]
-		public async Task<ActionResult> DeleteInterest(string interestName)
+		[HttpPatch("remove-interest")]
+		public async Task<ActionResult> RemoveInterest([FromBody] string interestName)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
 
@@ -175,7 +184,7 @@ namespace API.Controllers
 
 			if (userInterest == null)
 			{
-				return BadRequest("There's no interest with this name");
+				return NotFound("There's no interest with this name");
 			}
 
 			user!.UserInterests?.Remove(userInterest);
@@ -188,7 +197,7 @@ namespace API.Controllers
 			return BadRequest("Failed to delete interest");
 		}
 
-		[HttpPut("updatecontacts")]
+		[HttpPatch("update-contacts")]
 		public async Task<ActionResult> UpdateContacts(ContactsUpdateDto contactsUpdateDto)
 		{
 			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
@@ -238,6 +247,29 @@ namespace API.Controllers
 			}
 
 			return BadRequest("Problem adding photo");
+		}
+
+		[Authorize(Policy = "RequireModeratorRole")]
+		[HttpDelete("delete-user/{username}")]
+		public async Task<ActionResult> DeleteUser(string username)
+		{
+			var user = await _userManager.FindByNameAsync(username);
+
+			if (user == null)
+			{
+				return NotFound("There's no such a user");
+			}
+
+			var result = await _userManager.DeleteAsync(user);
+			
+			if (result.Succeeded)
+			{
+				return NoContent();
+			}
+			else
+			{
+				return BadRequest("Failed to delete user");
+			}
 		}
 	}
 }

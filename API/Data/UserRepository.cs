@@ -4,7 +4,6 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
@@ -94,6 +93,11 @@ namespace API.Data
 		public void AddPhoto(UserPhoto photo)
 		{
 			_context.UserPhotos.Add(photo);
+		}
+		
+		public void DeleteUser(AppUser user)
+		{
+			_context.Users.Remove(user);
 		}
 	}
 }
