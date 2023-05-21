@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppEvent } from 'src/app/_models/appEvent';
 import { EventNotification } from 'src/app/_models/eventNotification';
 import { EventParams } from 'src/app/_models/eventParams';
