@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace API.Data.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class PostgresInitial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,11 +14,11 @@ namespace API.Data.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,36 +29,36 @@ namespace API.Data.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FullName = table.Column<string>(type: "TEXT", nullable: false),
-                    ShowEmail = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Country = table.Column<string>(type: "TEXT", nullable: true),
-                    Region = table.Column<string>(type: "TEXT", nullable: true),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
-                    About = table.Column<string>(type: "TEXT", nullable: true),
-                    FacebookLink = table.Column<string>(type: "TEXT", nullable: true),
-                    InstagramLink = table.Column<string>(type: "TEXT", nullable: true),
-                    TwitterLink = table.Column<string>(type: "TEXT", nullable: true),
-                    LinkedInLink = table.Column<string>(type: "TEXT", nullable: true),
-                    WebsiteLink = table.Column<string>(type: "TEXT", nullable: true),
-                    Rating = table.Column<double>(type: "REAL", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LastActive = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FullName = table.Column<string>(type: "text", nullable: false),
+                    ShowEmail = table.Column<bool>(type: "boolean", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: true),
+                    Region = table.Column<string>(type: "text", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    About = table.Column<string>(type: "text", nullable: true),
+                    FacebookLink = table.Column<string>(type: "text", nullable: true),
+                    InstagramLink = table.Column<string>(type: "text", nullable: true),
+                    TwitterLink = table.Column<string>(type: "text", nullable: true),
+                    LinkedInLink = table.Column<string>(type: "text", nullable: true),
+                    WebsiteLink = table.Column<string>(type: "text", nullable: true),
+                    Rating = table.Column<double>(type: "double precision", nullable: false),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastActive = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,12 +66,29 @@ namespace API.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventNotifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TimeStamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    NotificationMessage = table.Column<string>(type: "text", nullable: false),
+                    EventId = table.Column<int>(type: "integer", nullable: false),
+                    EventName = table.Column<string>(type: "text", nullable: false),
+                    Read = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventNotifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EventTags",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    EventTagName = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EventTagName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,7 +99,7 @@ namespace API.Data.Migrations
                 name: "Groups",
                 columns: table => new
                 {
-                    GroupName = table.Column<string>(type: "TEXT", nullable: false)
+                    GroupName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,9 +110,9 @@ namespace API.Data.Migrations
                 name: "UserInterests",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    InterestName = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InterestName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,11 +123,11 @@ namespace API.Data.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -126,11 +144,11 @@ namespace API.Data.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -147,10 +165,10 @@ namespace API.Data.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -167,8 +185,8 @@ namespace API.Data.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RoleId = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -191,10 +209,10 @@ namespace API.Data.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -211,18 +229,19 @@ namespace API.Data.Migrations
                 name: "Events",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    EventName = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    IsEnded = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Country = table.Column<string>(type: "TEXT", nullable: false),
-                    Region = table.Column<string>(type: "TEXT", nullable: false),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    Currency = table.Column<string>(type: "TEXT", nullable: false),
-                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    EventOwnerId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EventName = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    IsEnded = table.Column<bool>(type: "boolean", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "boolean", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
+                    Region = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    Currency = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    EventOwnerId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -239,8 +258,8 @@ namespace API.Data.Migrations
                 name: "Friends",
                 columns: table => new
                 {
-                    AddingToFriendsUserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AddedToFriendsUserId = table.Column<int>(type: "INTEGER", nullable: false)
+                    AddingToFriendsUserId = table.Column<int>(type: "integer", nullable: false),
+                    AddedToFriendsUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -263,17 +282,17 @@ namespace API.Data.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SenderUsername = table.Column<string>(type: "TEXT", nullable: false),
-                    RecipientId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RecipientUsername = table.Column<string>(type: "TEXT", nullable: false),
-                    Content = table.Column<string>(type: "TEXT", nullable: false),
-                    DateRead = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    MessageSent = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    SenderDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    RecipientDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SenderId = table.Column<int>(type: "integer", nullable: false),
+                    SenderUsername = table.Column<string>(type: "text", nullable: false),
+                    RecipientId = table.Column<int>(type: "integer", nullable: false),
+                    RecipientUsername = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    DateRead = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    MessageSent = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SenderDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    RecipientDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -296,11 +315,11 @@ namespace API.Data.Migrations
                 name: "UserPhotos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PhotoUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    PublicId = table.Column<string>(type: "TEXT", nullable: true),
-                    AppUserId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PhotoUrl = table.Column<string>(type: "text", nullable: false),
+                    PublicId = table.Column<string>(type: "text", nullable: true),
+                    AppUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -314,12 +333,36 @@ namespace API.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AppUserEventNotification",
+                columns: table => new
+                {
+                    EventNotificationsId = table.Column<int>(type: "integer", nullable: false),
+                    RecipientsId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppUserEventNotification", x => new { x.EventNotificationsId, x.RecipientsId });
+                    table.ForeignKey(
+                        name: "FK_AppUserEventNotification_AspNetUsers_RecipientsId",
+                        column: x => x.RecipientsId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AppUserEventNotification_EventNotifications_EventNotificati~",
+                        column: x => x.EventNotificationsId,
+                        principalTable: "EventNotifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Connections",
                 columns: table => new
                 {
-                    ConnectionId = table.Column<string>(type: "TEXT", nullable: false),
-                    Username = table.Column<string>(type: "TEXT", nullable: false),
-                    GroupName = table.Column<string>(type: "TEXT", nullable: true)
+                    ConnectionId = table.Column<string>(type: "text", nullable: false),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    GroupName = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -335,8 +378,8 @@ namespace API.Data.Migrations
                 name: "AppUserUserInterest",
                 columns: table => new
                 {
-                    AppUsersId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserInterestsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    AppUsersId = table.Column<int>(type: "integer", nullable: false),
+                    UserInterestsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -359,8 +402,8 @@ namespace API.Data.Migrations
                 name: "AppUserEvent",
                 columns: table => new
                 {
-                    ParticipantsId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ParticipateInEventsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ParticipantsId = table.Column<int>(type: "integer", nullable: false),
+                    ParticipateInEventsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -383,8 +426,8 @@ namespace API.Data.Migrations
                 name: "AppUserEvent1",
                 columns: table => new
                 {
-                    InvitedToEventId = table.Column<int>(type: "INTEGER", nullable: false),
-                    InvitedToEventsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    InvitedToEventId = table.Column<int>(type: "integer", nullable: false),
+                    InvitedToEventsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -407,11 +450,11 @@ namespace API.Data.Migrations
                 name: "EventDate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EventId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EventId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -428,8 +471,8 @@ namespace API.Data.Migrations
                 name: "EventEventTag",
                 columns: table => new
                 {
-                    EventTagsId = table.Column<int>(type: "INTEGER", nullable: false),
-                    EventsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    EventTagsId = table.Column<int>(type: "integer", nullable: false),
+                    EventsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -452,11 +495,11 @@ namespace API.Data.Migrations
                 name: "EventPhotos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PhotoUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    PublicId = table.Column<string>(type: "TEXT", nullable: true),
-                    EventId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PhotoUrl = table.Column<string>(type: "text", nullable: false),
+                    PublicId = table.Column<string>(type: "text", nullable: true),
+                    EventId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -478,6 +521,11 @@ namespace API.Data.Migrations
                 name: "IX_AppUserEvent1_InvitedToEventsId",
                 table: "AppUserEvent1",
                 column: "InvitedToEventsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppUserEventNotification_RecipientsId",
+                table: "AppUserEventNotification",
+                column: "RecipientsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppUserUserInterest_UserInterestsId",
@@ -578,6 +626,9 @@ namespace API.Data.Migrations
                 name: "AppUserEvent1");
 
             migrationBuilder.DropTable(
+                name: "AppUserEventNotification");
+
+            migrationBuilder.DropTable(
                 name: "AppUserUserInterest");
 
             migrationBuilder.DropTable(
@@ -615,6 +666,9 @@ namespace API.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserPhotos");
+
+            migrationBuilder.DropTable(
+                name: "EventNotifications");
 
             migrationBuilder.DropTable(
                 name: "UserInterests");

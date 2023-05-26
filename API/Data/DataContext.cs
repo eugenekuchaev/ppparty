@@ -1,3 +1,4 @@
+using System.Reflection;
 using API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -81,7 +82,7 @@ namespace API.Data
 			modelBuilder.Entity<Event>()
 				.HasMany(e => e.InvitedToEvent)
 				.WithMany(e => e.InvitedToEvents);
-				
+
 			modelBuilder.Entity<EventNotification>()
 				.HasMany(e => e.Recipients)
 				.WithMany(e => e.EventNotifications);
@@ -92,19 +93,22 @@ namespace API.Data
 
 	public static class UtcDateAnnotation
 	{
-		private const String IsUtcAnnotation = "IsUtc";
-		private static readonly ValueConverter<DateTime, DateTime> UtcConverter =
-		  new ValueConverter<DateTime, DateTime>(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-		private static readonly ValueConverter<DateTime?, DateTime?> UtcNullableConverter =
-		  new ValueConverter<DateTime?, DateTime?>(v => v, v => v == null ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc));
-
-		public static PropertyBuilder<TProperty> IsUtc<TProperty>(this PropertyBuilder<TProperty> builder, Boolean isUtc = true) =>
-		  builder.HasAnnotation(IsUtcAnnotation, isUtc);
-
-		public static Boolean IsUtc(this IMutableProperty property) =>
-		  ((Boolean?)property.FindAnnotation(IsUtcAnnotation)?.Value) ?? true;
-
+		private const string IsUtcAnnotation = "IsUtc";
+		private static readonly ValueConverter<DateTime, DateTime> UtcConverter = new ValueConverter<DateTime, DateTime>(convertTo => DateTime.SpecifyKind(convertTo, DateTimeKind.Utc), convertFrom => convertFrom);
+		public static PropertyBuilder<TProperty> IsUtc<TProperty>(this PropertyBuilder<TProperty> builder, bool isUtc = true) => builder.HasAnnotation(IsUtcAnnotation, isUtc);
+		public static bool IsUtc(this IMutableProperty property)
+		{
+			if (property != null && property.PropertyInfo != null)
+			{
+				var attribute = property.PropertyInfo.GetCustomAttribute<IsUtcAttribute>();
+				if (attribute is not null && attribute.IsUtc)
+				{
+					return true;
+				}
+				return ((bool?)property.FindAnnotation(IsUtcAnnotation)?.Value) ?? true;
+			}
+			return true;
+		}
 		public static void ApplyUtcDateTimeConverter(this ModelBuilder builder)
 		{
 			foreach (var entityType in builder.Model.GetEntityTypes())
@@ -115,18 +119,19 @@ namespace API.Data
 					{
 						continue;
 					}
-
-					if (property.ClrType == typeof(DateTime))
+					if (property.ClrType == typeof(DateTime) ||
+						property.ClrType == typeof(DateTime?))
 					{
 						property.SetValueConverter(UtcConverter);
-					}
-
-					if (property.ClrType == typeof(DateTime?))
-					{
-						property.SetValueConverter(UtcNullableConverter);
 					}
 				}
 			}
 		}
+	}
+	
+	public class IsUtcAttribute : Attribute
+	{
+		public IsUtcAttribute(bool isUtc = true) => this.IsUtc = isUtc;
+		public bool IsUtc { get; }
 	}
 }

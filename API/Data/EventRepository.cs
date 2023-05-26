@@ -158,9 +158,9 @@ namespace API.Data
 			}
 
 			query = query
-				.Where(x => x.IsCancelled != true)
-				.Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now)
-				.OrderBy(x => x.EventDates!.Min(y => y.StartDate));
+                .Where(x => x.IsCancelled != true)
+                .Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now.ToUniversalTime())
+                .OrderBy(x => x.EventDates!.Min(y => y.StartDate));
 
 			return await PagedList<EventDto>.CreateAsync(
 				query.ProjectTo<EventDto>(_mapper.ConfigurationProvider).AsNoTracking(),
@@ -339,7 +339,7 @@ namespace API.Data
 			return await _context.Events
 				.Where(x => x.Participants.Any(y => y.UserName == username) || x.EventOwner.UserName == username)
 				.Where(x => !x.IsCancelled)
-				.Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now)
+				.Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now.ToUniversalTime())
 				.Where(x => !x.Participants.Any(y => y.UserName == friendUsername))
 				.Where(x => x.EventOwner.UserName != friendUsername)
 				.ProjectTo<EventDto>(_mapper.ConfigurationProvider)

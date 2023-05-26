@@ -25,11 +25,12 @@
                         <i class="fa fa-money fa-lg"></i> {{appEvent.price}} {{appEvent.currency}}
                     </h6>
                 </div>
-                <ng-container *ngFor="let eventTag of appEvent.eventTags">
+                <ng-container *ngFor="let eventTag of appEvent.eventTags | slice:0:5">
                     <span class="badge bg-primary" routerLink="/events/{{appEvent.id}}">
-                        {{eventTag.eventTagName}}
+                      {{eventTag.eventTagName}}
                     </span>
-                </ng-container>
+                  </ng-container>
+                  
                 <div 
                     class="position-absolute bottom-0 end-0 mb-3 me-3" 
                     *ngIf="showParticipateButtonInRecommended">
