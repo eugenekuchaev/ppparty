@@ -14,7 +14,7 @@ namespace API.Extensions
         {
             services.AddDbContext<DataContext>(options =>
             {
-                options.UseNpgsql(Environment.GetEnvironmentVariable("DefaultConnection")!);
+                options.UseNpgsql(Environment.GetEnvironmentVariable("DatabaseDefaultConnection")!);
             });
 
             services.AddRouting(options =>

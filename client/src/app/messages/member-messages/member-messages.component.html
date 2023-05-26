@@ -21,12 +21,12 @@
                     <div class="message-container">
                         <div class="image-container chat-img" *ngIf="(presence.onlineUsers$ | async).includes(message.senderUsername)">
                             <img class="img-circle rounded-circle me-2" src="{{message.senderPhotoUrl}}"
-                                alt="{{message.senderFullName}}">
+                                alt="{{message.senderFullName}}" routerLink="/members/{{message.senderUsername}}">
                             <div class="green-circle"></div>
                         </div>
                         <div class="image-container chat-img" *ngIf="!(presence.onlineUsers$ | async).includes(message.senderUsername)">
                             <img class="img-circle rounded-circle me-2" src="{{message.senderPhotoUrl}}"
-                                alt="{{message.senderFullName}}">
+                                alt="{{message.senderFullName}}" routerLink="/members/{{message.senderUsername}}">
                             <div class="grey-circle"></div>
                         </div>
                         <div class="chat-body">

@@ -31,6 +31,7 @@
 
 .chat-img {
     margin-right: 10px;
+    cursor: pointer;
 }
 
 .chat-body {
