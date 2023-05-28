@@ -48,4 +48,4 @@ Run `dotnet run` in the 'API' folder and `ng serve` in the 'client' folder.<br>
 Access the app at [https://localhost:4200](https://localhost:4200).
 
 ## Notes
-The Angular app is poorly written and only serves as a demonstration of the API functionality in a convenient manner. Please feel free to contribute new pull requests and raise issues. You are also welcome to use this repository or any of its components as needed.
+The Angular app is poorly written and only serves as a demonstration of the API functionality in a convenient manner. Please feel free to contribute new pull requests and raise issues. You are also welcome to use this repository or any of its components as needed. Optimized only for 1920x1080 screen resolution.
