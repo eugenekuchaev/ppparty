@@ -59,6 +59,36 @@
                         <a *ngIf="member.websiteLink != null && member.websiteLink != ''" href="{{member.websiteLink}}"
                             role="button"><i class="fa fa-globe"></i></a>
                     </div>
+
+                    <button 
+                        class="btn btn btn-success mt-4 mb-2" 
+                        *ngIf="friendshipStatus === FriendshipStatus.NoFriendship" 
+                        (click)="addFriend(member)">
+                            Add to friends
+                    </button>
+                    <button 
+                        class="btn btn btn-success mt-4 mb-2" 
+                        *ngIf="friendshipStatus === FriendshipStatus.AddedToFriends" 
+                        (click)="addFriend(member)">
+                            Accept request
+                    </button>
+                    <button 
+                        class="btn btn btn-danger mt-4 mb-2" 
+                        *ngIf="friendshipStatus === FriendshipStatus.AddingToFriends" 
+                        (click)="deleteFriend(member)">
+                            Cancel request
+                    </button>
+                    <div *ngIf="friendshipStatus === FriendshipStatus.AreFriends">
+                        <button class="btn btn btn-success mt-4 mb-2" routerLink="/messages/{{member.username}}">
+                            Messages
+                        </button>
+                        <button class="btn btn btn-primary mt-4 mb-2" routerLink="/events/invitefrommembers/{{member.username}}">
+                            Invite
+                        </button>
+                        <button class="btn btn btn-danger mt-4 mb-2" (click)="deleteFriend(member)">
+                            Unfriend
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

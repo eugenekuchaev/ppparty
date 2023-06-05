@@ -1,5 +1,6 @@
 using API.DTOs;
 using API.Entities;
+using API.Enums;
 using API.Extensions;
 using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -99,6 +100,12 @@ namespace API.Controllers
 			var users = await _unitOfWork.FriendsRepository.GetFriends(predicate, User.GetUserId());
 			
 			return Ok(users);
+		}
+		
+		[HttpGet("users-friendship/{username}")]
+		public async Task<ActionResult<FriendshipStatus>> GetUsersFriendship(string username)
+		{
+			return Ok(await _unitOfWork.FriendsRepository.CheckUsersFriendship(User.GetUsername(), username));
 		}
 	}
 }

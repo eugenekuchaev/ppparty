@@ -7,6 +7,7 @@ import { User } from '../_models/user';
 import { UserParams } from '../_models/userParams';
 import { AccountService } from './account.service';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
+import { FriendshipStatus } from '../_models/friendshipStatus';
 
 @Injectable({
   providedIn: 'root'
@@ -123,5 +124,9 @@ export class MembersService {
 
   getFriends(predicate: string) {
     return this.http.get<Partial<Member[]>>(this.baseUrl + 'friends?predicate=' + predicate);
+  }
+
+  getUsersFriendship(secondUserUsername: string) {
+    return this.http.get<FriendshipStatus>(this.baseUrl + 'friends/users-friendship/' + secondUserUsername);
   }
 } 

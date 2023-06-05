@@ -1,5 +1,6 @@
 using API.DTOs;
 using API.Entities;
+using API.Enums;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -69,20 +70,37 @@ namespace API.Data
 				.FirstOrDefaultAsync(x => x.Id == userId);
 		}
 		
-		public async Task<bool> CheckIfUsersAreFriends(int firstUserId, int secondUserId)
+		public async Task<FriendshipStatus> CheckUsersFriendship(string currentUserUsername, string secondUserUsername)
 		{
 			var firstUserFriendship = await _context.Friends
-				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == firstUserId && f.AddedToFriendsUserId == secondUserId);
+				.FirstOrDefaultAsync(f => f.AddingToFriendsUser!.UserName == currentUserUsername && 
+					f.AddedToFriendsUser!.UserName == secondUserUsername);
 
 			var secondUserFrienship = await _context.Friends
-				.FirstOrDefaultAsync(f => f.AddingToFriendsUserId == secondUserId && f.AddedToFriendsUserId == firstUserId);
+				.FirstOrDefaultAsync(f => f.AddingToFriendsUser!.UserName == secondUserUsername && 
+					f.AddedToFriendsUser!.UserName == currentUserUsername);
 
-			if (firstUserFriendship == null || secondUserFrienship == null)
+			if (firstUserFriendship == null && secondUserFrienship == null)
 			{
-				return false;
+				return FriendshipStatus.NoFriendship;
 			}
 			
-			return true;
+			if (firstUserFriendship != null && secondUserFrienship == null)
+			{
+				return FriendshipStatus.AddingToFriends;
+			}
+			
+			if (firstUserFriendship == null && secondUserFrienship != null)
+			{
+				return FriendshipStatus.AddedToFriends;
+			}
+			
+			if (firstUserFriendship != null && secondUserFrienship != null)
+			{
+				return FriendshipStatus.AreFriends;
+			}
+			
+			return FriendshipStatus.NoFriendship;
 		}
 	}
 }

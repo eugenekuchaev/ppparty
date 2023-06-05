@@ -158,9 +158,9 @@ namespace API.Data
 			}
 
 			query = query
-                .Where(x => x.IsCancelled != true)
-                .Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now.ToUniversalTime())
-                .OrderBy(x => x.EventDates!.Min(y => y.StartDate));
+				.Where(x => x.IsCancelled != true)
+				.Where(x => x.EventDates.Max(y => y.EndDate) >= DateTime.Now.ToUniversalTime())
+				.OrderBy(x => x.EventDates!.Min(y => y.StartDate));
 
 			return await PagedList<EventDto>.CreateAsync(
 				query.ProjectTo<EventDto>(_mapper.ConfigurationProvider).AsNoTracking(),
@@ -195,6 +195,8 @@ namespace API.Data
 						eventDto.FriendsParticipants = friendsParticipants;
 					}
 				}
+				
+				eventDto.EventDates = eventDto.EventDates!.OrderBy(x => x.StartDate).ToList();
 			}
 
 			return eventDto;

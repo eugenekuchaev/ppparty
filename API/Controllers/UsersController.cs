@@ -248,28 +248,5 @@ namespace API.Controllers
 
 			return BadRequest("Problem adding photo");
 		}
-
-		[Authorize(Policy = "RequireModeratorRole")]
-		[HttpDelete("delete-user/{username}")]
-		public async Task<ActionResult> DeleteUser(string username)
-		{
-			var user = await _userManager.FindByNameAsync(username);
-
-			if (user == null)
-			{
-				return NotFound("There's no such a user");
-			}
-
-			var result = await _userManager.DeleteAsync(user);
-			
-			if (result.Succeeded)
-			{
-				return NoContent();
-			}
-			else
-			{
-				return BadRequest("Failed to delete user");
-			}
-		}
 	}
 }

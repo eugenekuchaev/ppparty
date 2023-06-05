@@ -1,6 +1,7 @@
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Enums;
 using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
@@ -78,7 +79,8 @@ namespace API.SignalR
 				throw new HubException("Not found user");
 			}
 
-			if (!await _unitOfWork.FriendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
+			if (await _unitOfWork.FriendsRepository.CheckUsersFriendship(sender!.UserName, recipient.UserName) != 
+				FriendshipStatus.AreFriends)
 			{
 				throw new HubException("You are not friends with this user");
 			}

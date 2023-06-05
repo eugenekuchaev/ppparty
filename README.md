@@ -1,6 +1,8 @@
 # ppparty
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+[Working demo](https://ppparty.ru)
+
 ## Overview
 The ppparty app is an event-centered social media platform designed to help people find events based on their location and interests. It aims to connect event-goers with exciting and relevant experiences while providing event creators a platform to promote their events and find interested participants.
 

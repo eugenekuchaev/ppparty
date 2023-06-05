@@ -1,5 +1,6 @@
 using API.DTOs;
 using API.Entities;
+using API.Enums;
 using API.Extensions;
 using API.Helpers;
 using API.Interfaces;
@@ -69,7 +70,7 @@ namespace API.Controllers
 
 			if (appEvent != null)
 			{
-				return appEvent;
+				return Ok(appEvent);
 			}
 
 			return NotFound("Event not found");
@@ -341,28 +342,6 @@ namespace API.Controllers
 
 			return BadRequest("Problem adding photo");
 		}
-
-		[Authorize(Policy = "RequireModeratorRole")]
-		[HttpDelete("delete-event/{eventId}")]
-		public async Task<ActionResult> DeleteEvent(int eventId)
-		{
-			var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
-			var appEvent = await _unitOfWork.EventRepository.GetEventEntityAsync(eventId);
-
-			if (appEvent == null)
-			{
-				return NotFound("There's no event with this Id");
-			}
-
-			_unitOfWork.EventRepository.DeleteEvent(appEvent);
-
-			if (await _unitOfWork.Complete())
-			{
-				return NoContent();
-			}
-
-			return BadRequest("Failed to delete event");
-		}
 		
 		[HttpGet("invites")]
 		public async Task<ActionResult<IEnumerable<EventDto>>> GetInvites()
@@ -381,7 +360,8 @@ namespace API.Controllers
 				return NotFound("There's no such a user");
 			}
 
-			if (!await _unitOfWork.FriendsRepository.CheckIfUsersAreFriends(sender!.Id, recipient.Id))
+			if (await _unitOfWork.FriendsRepository.CheckUsersFriendship(sender!.UserName, recipient.UserName) != 
+				FriendshipStatus.AreFriends)
 			{
 				return BadRequest("You are not friends with this user");
 			}
